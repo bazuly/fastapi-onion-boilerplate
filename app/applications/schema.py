@@ -16,3 +16,14 @@ class ApplicationSchema(BaseModel):
 class ApplicationCreateSchema(BaseModel):
     user_name: str
     description: str | None
+
+
+class ApplicationResponseSchema(BaseModel):
+    id: int
+    user_name: str
+    description: str | None
+    created_at: dt
+    kafka_status: bool
+
+    class Config:
+        from_attributes = True
