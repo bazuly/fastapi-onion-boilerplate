@@ -19,7 +19,7 @@
    cp .env.example .env
    docker-compose up -d --build
    docker-compose exec web alembic upgrade head
-   docker-compose exec web alembic alembic revision --autogenerate -m "migration_name"
+   docker-compose exec web alembic revision --autogenerate -m "migration_name"
     
 2. Сервис будет доступен по адресу: http://localhost:8000/docs/
 
