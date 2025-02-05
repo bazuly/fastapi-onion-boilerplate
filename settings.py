@@ -2,15 +2,19 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DB_HOST: str
-    DB_PORT: str
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_NAME: str
-    DB_DRIVER: str
-    KAFKA_BOOTSTRAP_SERVERS: str = 'localhost:9092'
-    KAFKA_TOPIC: str
+    DB_HOST: str = "db"
+    DB_PORT: str = "5432"
+    DB_USER: str = "postgres"
+    DB_PASSWORD: str = "password"
+    DB_NAME: str = "postgres"
+    DB_DRIVER: str = "postgresql+asyncpg"
+    KAFKA_BOOTSTRAP_SERVERS: str = 'kafka:19092'
+    KAFKA_TOPIC: str = "applications"
 
+    # -------------------------------------------------------------------
+    # for work with .env files we can use pydantic, like on our example,
+    # or we can use python_dotenv
+    # -------------------------------------------------------------------
     class Config:
         env_file = ".env"
 

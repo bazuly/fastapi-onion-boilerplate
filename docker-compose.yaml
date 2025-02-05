@@ -1,4 +1,17 @@
 services:
+  web:
+    build: .
+    command: "poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - kafka
+
   db:
     image: postgres
     restart: always
@@ -10,9 +23,9 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - db_data:/var/lib/postgresql/data
-      -
+
   zookeeper:
-    platform: linux/x86_64
+    platform: linux/x86_64 # if you are using mac with M CPU, this flag is necessary
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: zoo1
     container_name: zoo1
@@ -24,13 +37,13 @@ services:
       ZOOKEEPER_SERVERS: zoo1:2888:3888
 
   kafka:
-    platform: linux/x86_64
+    platform: linux/x86_64 # if you are using mac with M CPU, this flag is necessary
     image: confluentinc/cp-kafka:7.3.2
     hostname: kafka1
     container_name: kafka1
     ports:
       - "9092:9092"
-      - "29092:29092"
+      - "19092:19092"
       - "9999:9999"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
@@ -52,4 +65,8 @@ services:
 
 volumes:
   db_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
     driver: local

@@ -1,6 +1,6 @@
-from typing import List
+from typing import Sequence
 
-from sqlalchemy.orm.session import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import insert, select
 from fastapi import HTTPException
 
@@ -10,7 +10,7 @@ from app.applications.models import ApplicationModel
 
 class ApplicationRepository:
 
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
     async def create_application(self, application: ApplicationCreateSchema) -> ApplicationModel:
@@ -28,7 +28,7 @@ class ApplicationRepository:
             added_application = result.scalar_one_or_none()
             return added_application
 
-    async def get_all_applications(self, page: int, size: int) -> List[ApplicationModel]:
+    async def get_all_applications(self, page: int, size: int) -> Sequence[ApplicationModel]:
         offset = (page - 1) * size
         async with self.db_session as session:
             query = select(ApplicationModel).offset(offset).limit(size)
@@ -43,7 +43,7 @@ class ApplicationRepository:
             user_name: str,
             page: int,
             size: int
-    ) -> List[ApplicationModel] | None:
+    ) -> Sequence[ApplicationModel]:
         offset = (page - 1) * size
         query = select(ApplicationModel).where(ApplicationModel.user_name == user_name).offset(offset).limit(size)
         async with self.db_session as session:

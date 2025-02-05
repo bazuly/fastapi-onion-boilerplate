@@ -12,6 +12,12 @@ from settings import settings
 
 @dataclass
 class ApplicationService:
+    """
+    Service for applications.
+    Attributes:
+        application_repository: Repository for work with DB
+        kafka_producer: Producer for sending messages in Kafka
+    """
     application_repository: ApplicationRepository
     kafka_producer: KafkaProducer
 
@@ -61,5 +67,4 @@ class ApplicationService:
         applications: Any = await self.application_repository.get_all_applications(page=page, size=size)
         if not applications:
             raise HTTPException(status_code=404, detail=f"No applications found")
-        # return applications
         return [ApplicationSchema.model_validate(app) for app in applications]
