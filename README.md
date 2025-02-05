@@ -39,43 +39,48 @@
 
 📚 API Endpoints
 
-1. Пример пост запроса. POST /applications/
-    - Пример ответа:
+1. Создание новой заявки
+POST /applications/
+
+Пример запроса:
 
 {
-"user_name": "john_doe",
-"description": "New feature request"
+  "user_name": "john_doe",
+  "description": "New feature request"
 }
+
 
 2. Получить список заявок. GET /applications/?page=1&size=10
     - Пример ответа:
 
 [
-{
-"id": 1,
-"user_name": "john_doe",
-"description": "New feature request",
-"created_at": "2023-10-01T12:00:00"
-},
-{
-"id": 2,
-"user_name": "jane_doe",
-"description": "Bug fix",
-"created_at": "2023-10-01T12:05:00"
-}
+  {
+    "id": 1,
+    "user_name": "john_doe",
+    "description": "New feature request",
+    "created_at": "2023-10-01T12:00:00"
+  },
+  {
+    "id": 2,
+    "user_name": "jane_doe",
+    "description": "Bug fix",
+    "created_at": "2023-10-01T12:05:00"
+  }
 ]
+
 
 3. Получить заявки по имени пользователя. GET /applications/{user_name}?page=1&size=10
     - Пример ответа.
 
 [
-{
-"id": 1,
-"user_name": "john_doe",
-"description": "New feature request",
-"created_at": "2023-10-01T12:00:00"
-}
+  {
+    "id": 1,
+    "user_name": "john_doe",
+    "description": "New feature request",
+    "created_at": "2023-10-01T12:00:00"
+  }
 ]
+
 
 🐳 Docker Compose
 
