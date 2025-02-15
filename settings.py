@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DB_DRIVER: str = "postgresql+asyncpg"
     KAFKA_BOOTSTRAP_SERVERS: str = 'kafka:19092'
     KAFKA_TOPIC: str = "applications"
+    IMAGE_UPLOAD_DIR: str = "uploads/images"
 
     # -------------------------------------------------------------------
     # for work with .env files we can use pydantic, like on our example,
