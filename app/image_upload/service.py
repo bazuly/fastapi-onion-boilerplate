@@ -44,15 +44,17 @@ class ImageService:
         )
 
     async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
-        image = await self.image_repository.get_image_by_id(image_id)
-        if not image:
+        try:
+            image = await self.image_repository.get_image_by_id(image_id)
+            return image
+        except:
             raise HTTPException(status_code=404, detail="Image not found")
-        return image
 
     async def delete_image_by_id(self, image_id: int) -> dict:
-        image = await self.image_repository.delete_image_by_id(image_id)
-        if not image:
+        try:
+            await self.image_repository.delete_image_by_id(image_id)
+            return {
+                "msg": f"Image {image_id} deleted successfully"
+            }
+        except:
             raise HTTPException(status_code=404, detail="Image not found")
-        return {
-            "msg": f"Image {image_id} deleted successfully"
-        }
