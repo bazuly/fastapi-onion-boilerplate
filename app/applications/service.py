@@ -40,7 +40,6 @@ class ApplicationService:
                 value=message
             )
             kafka_status = True
-
         except Exception as e:
             print(f"Error while sending kafka message: {e}")
 
