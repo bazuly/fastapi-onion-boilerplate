@@ -4,12 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.applications.repository.application_repository import ApplicationRepository
 from app.applications.service import ApplicationService
 from app.broker.producer import KafkaProducer
+from app.image_upload.service import ImageService
 from app.infrastructure.database import get_db_connection
+from app.image_upload.repository.image_repository import ImageRepository
+
 from settings import settings
-
-
-async def get_application_repository(db_session: AsyncSession = Depends(get_db_connection)) -> ApplicationRepository:
-    return ApplicationRepository(db_session=db_session)
 
 
 async def get_kafka_producer() -> KafkaProducer:
@@ -18,11 +17,29 @@ async def get_kafka_producer() -> KafkaProducer:
     return producer
 
 
+async def get_application_repository(db_session: AsyncSession = Depends(get_db_connection)) -> ApplicationRepository:
+    return ApplicationRepository(db_session=db_session)
+
+
 async def get_application_service(
         application_repository: ApplicationRepository = Depends(get_application_repository),
         kafka_producer: KafkaProducer = Depends(get_kafka_producer),
 ) -> ApplicationService:
     return ApplicationService(
         application_repository=application_repository,
+        kafka_producer=kafka_producer,
+    )
+
+
+async def get_image_upload_repository(db_session: AsyncSession = Depends(get_db_connection)) -> ImageRepository:
+    return ImageRepository(db_session=db_session, upload_dir=settings.IMAGE_UPLOAD_DIR)
+
+
+async def get_image_upload_service(
+        image_upload_repository: ImageRepository = Depends(get_image_upload_repository),
+        kafka_producer: KafkaProducer = Depends(get_kafka_producer),
+) -> ImageService:
+    return ImageService(
+        image_repository=image_upload_repository,
         kafka_producer=kafka_producer,
     )

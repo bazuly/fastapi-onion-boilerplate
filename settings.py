@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     DB_DRIVER: str = "postgresql+asyncpg"
     KAFKA_BOOTSTRAP_SERVERS: str = 'kafka:19092'
     KAFKA_TOPIC: str = "applications"
+    KAFKA_GROUP_ID: str = "my-group"
+    IMAGE_UPLOAD_DIR: str = "uploads/images"
 
     # -------------------------------------------------------------------
     # for work with .env files we can use pydantic, like on our example,
@@ -26,6 +28,16 @@ class Settings(BaseSettings):
 class DescriptionSettings(BaseSettings):
     PAGE_DESCRIPTION: str = "Page number, starts with one"
     SIZE_DESCRIPTION: str = "Amount elements on the page"
+
+
+class LoggingSettings(BaseSettings):
+    LOG_LEVEL: str = "INFO"
+    LOG_FORMATTER: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    LOG_FILE: str = "logs/app.log"
+
+
+def configure_logging(settings: LoggingSettings):
+    ...
 
 
 settings = Settings()
