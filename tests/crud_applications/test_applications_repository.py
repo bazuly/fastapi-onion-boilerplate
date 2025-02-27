@@ -29,10 +29,12 @@ async def test_get_all_applications(db_session: AsyncSession):
     app_1 = ApplicationModel(
         title="test_1",
         description="test_descr_1",
+        user_id=uuid.uuid4(),
     )
     app_2 = ApplicationModel(
         title="test_2",
         description="test_descr_2",
+        user_id=uuid.uuid4(),
     )
     db_session.add_all([app_1, app_2])
     await db_session.commit()
@@ -49,6 +51,7 @@ async def test_get_single_application(db_session: AsyncSession):
     app_1 = ApplicationModel(
         title="test_1",
         description="test_descr_1",
+        user_id=uuid.uuid4(),
     )
     db_session.add(app_1)
     await db_session.commit()

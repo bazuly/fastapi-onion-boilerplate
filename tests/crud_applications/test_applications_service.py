@@ -16,9 +16,10 @@ async def test_create_application__success():
 
     mock_repository.create_application.return_value = AsyncMock(
         id=1,
-        user_name="test_user",
+        title="test_title",
         description="Test",
-        created_at=datetime.utcnow()
+        created_at=datetime.utcnow(),
+        user_id=user_id,
     )
     service = ApplicationService(mock_repository, mock_kafka)
     app_data = ApplicationCreateSchema(
@@ -40,12 +41,13 @@ async def test_create_application__failure():
     mock_kafka.produce.side_effect = Exception("Kafka error")
     mock_repo.create_application.return_value = AsyncMock(
         id=1,
-        user_name="test_user",
+        title="test_title",
         description="Test",
-        created_at=datetime.utcnow()
+        created_at=datetime.utcnow(),
+        user_id=user_id,
     )
     service = ApplicationService(mock_repo, mock_kafka)
-    app_data = ApplicationCreateSchema(title="test_user", description="Test")
+    app_data = ApplicationCreateSchema(title="test_title", description="Test")
 
     result = await service.create_application(app_data, user_id)
 
@@ -82,6 +84,7 @@ async def test_get_application_by_title__failure():
         user_name="correct_username",
         description="Test",
         created_at=datetime.utcnow()
+
     )
     service = ApplicationService(mock_repo, mock_kafka)
 
