@@ -1,6 +1,7 @@
 import os
-from typing import Any
 from datetime import datetime
+from typing import Any
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -13,7 +14,7 @@ class ImageRepository:
         self.db_session = db_session
         self.upload_dir = upload_dir
 
-    async def upload_image(self, image: Any) -> ImageUploadModel:
+    async def upload_image(self, image: Any, user_id: UUID) -> ImageUploadModel:
         os.makedirs(self.upload_dir, exist_ok=True)
 
         file_path = os.path.join(self.upload_dir, image.filename)
@@ -26,6 +27,7 @@ class ImageRepository:
             filename=image.filename,
             upload_date=datetime.utcnow(),
             size=len(content) / 1024 / 1024,
+            user_id=user_id,
         )
         self.db_session.add(image)
         await self.db_session.commit()

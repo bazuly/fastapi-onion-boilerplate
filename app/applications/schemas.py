@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class ApplicationSchema(BaseModel):
     id: int
-    user_name: str
+    title: str
     description: str | None
     created_at: dt
 
@@ -14,13 +14,13 @@ class ApplicationSchema(BaseModel):
 
 
 class ApplicationCreateSchema(BaseModel):
-    user_name: str
+    title: str
     description: str | None
 
 
 class ApplicationResponseSchema(BaseModel):
     id: int
-    user_name: str
+    title: str
     description: str | None
     created_at: dt
     kafka_status: bool

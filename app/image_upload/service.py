@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from typing import Any
+from uuid import UUID
 
 from fastapi import HTTPException
 
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository.image_repository import ImageRepository
-from app.image_upload.schema import ImageResponse
+from app.image_upload.schemas import ImageResponse
 from app.broker.producer import KafkaProducer
 from settings import settings
 
@@ -15,14 +16,20 @@ class ImageService:
     image_repository: ImageRepository
     kafka_producer: KafkaProducer
 
-    async def upload_image(self, image: Any) -> Any:
-        uploaded_image = await self.image_repository.upload_image(image)
+    async def upload_image(
+            self,
+            image: Any,
+            user_id: UUID,
+
+    ) -> Any:
+        uploaded_image = await self.image_repository.upload_image(image, user_id)
 
         kafka_message = {
             "id": uploaded_image.id,
             "filename": uploaded_image.filename,
             "size": uploaded_image.size,
-            "upload_date": uploaded_image.upload_date.isoformat()
+            "upload_date": uploaded_image.upload_date.isoformat(),
+            "user_id": str(user_id)
         }
         kafka_status = False
         try:
@@ -40,7 +47,7 @@ class ImageService:
             filename=uploaded_image.filename,
             size=uploaded_image.size,
             upload_date=uploaded_image.upload_date,
-            kafka_status=kafka_status
+            kafka_status=kafka_status,
         )
 
     async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
@@ -50,6 +57,8 @@ class ImageService:
         except:
             raise HTTPException(status_code=404, detail="Image not found")
 
+    # TODO нужно ли здесь добавлять логику удаления изображения из самой директории ?
+    # TODO по идее должно быть в репозитории данная логика
     async def delete_image_by_id(self, image_id: int) -> dict:
         try:
             await self.image_repository.delete_image_by_id(image_id)

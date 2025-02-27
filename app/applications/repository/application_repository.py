@@ -1,10 +1,11 @@
 from typing import Sequence
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update, delete
 from fastapi import HTTPException
 
-from app.applications.schema import ApplicationCreateSchema
+from app.applications.schemas import ApplicationCreateSchema
 from app.applications.models import ApplicationModel
 
 
@@ -13,12 +14,17 @@ class ApplicationRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def create_application(self, application: ApplicationCreateSchema) -> ApplicationModel:
+    async def create_application(
+            self,
+            application: ApplicationCreateSchema,
+            user_id: UUID
+    ) -> ApplicationModel:
         query = (
             insert(ApplicationModel)
             .values(
-                user_name=application.user_name,
+                title=application.title,
                 description=application.description,
+                user_id=user_id,
             )
             .returning(ApplicationModel)
         )
@@ -28,7 +34,30 @@ class ApplicationRepository:
             added_application = result.scalar_one_or_none()
             return added_application
 
-    async def get_all_applications(self, page: int, size: int) -> Sequence[ApplicationModel]:
+    @staticmethod
+    async def get_user_application(
+            application_id: int,
+            user_id: UUID,
+            session: AsyncSession
+    ) -> ApplicationModel:
+        query = select(ApplicationModel).where(
+            ApplicationModel.id == application_id,
+            ApplicationModel.user_id == user_id
+        )
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_application_by_id(self, application_id: int) -> ApplicationModel:
+        query = select(ApplicationModel).where(ApplicationModel.id == application_id)
+        async with self.db_session as session:
+            application: ApplicationModel = (await session.execute(query)).scalar_one_or_none()
+        return application
+
+    async def get_all_applications(
+            self,
+            page: int,
+            size: int,
+    ) -> Sequence[ApplicationModel]:
         offset = (page - 1) * size
         async with self.db_session as session:
             query = select(ApplicationModel).offset(offset).limit(size)
@@ -38,16 +67,75 @@ class ApplicationRepository:
                 raise HTTPException(status_code=404, detail="No applications found")
         return applications
 
-    async def get_application_by_username(
+    async def get_application_by_title(
             self,
-            user_name: str,
-            page: int,
-            size: int
+            title: str,
     ) -> Sequence[ApplicationModel]:
-        offset = (page - 1) * size
-        query = select(ApplicationModel).where(ApplicationModel.user_name == user_name).offset(offset).limit(size)
+        query = select(ApplicationModel).where(ApplicationModel.title == title)
         async with self.db_session as session:
             result = await session.execute(query)
             if not result:
                 raise HTTPException(status_code=404, detail="No applications found")
             return result.scalars().all()
+
+    async def delete_user_application(
+            self,
+            application_id: int,
+            user_id: UUID
+    ) -> dict:
+        query = select(ApplicationModel).where(
+            ApplicationModel.id == application_id,
+            ApplicationModel.user_id == user_id
+        )
+
+        async with self.db_session as session:
+            result = await session.execute(query)
+            application = result.scalar_one_or_none()
+
+            if not application:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Application not found or access denied"
+                )
+
+            delete_query = delete(ApplicationModel).where(
+                ApplicationModel.id == application_id
+            )
+            await session.execute(delete_query)
+            await session.commit()
+
+        return {"status": "success", "message": "Application deleted"}
+
+    async def edit_application_info(
+            self,
+            application_id: int,
+            user_id: UUID,
+            new_title: str | None = None,
+            new_description: str | None = None,
+    ) -> ApplicationModel:
+        async with self.db_session as session:
+            application = await self.get_user_application(
+                application_id,
+                user_id,
+                session
+            )
+
+            if not application:
+                raise HTTPException(status_code=404, detail="Application not found or access denied")
+
+            update_data = {}
+            if new_title is not None:
+                update_data["title"] = new_title
+            if new_description is not None:
+                update_data["description"] = new_description
+
+            if update_data:
+                await session.execute(
+                    update(ApplicationModel)
+                    .where(ApplicationModel.id == application_id)
+                    .values(**update_data)
+                )
+                await session.commit()
+                await session.refresh(application)
+
+            return application
