@@ -35,6 +35,7 @@ class DescriptionSettings(BaseSettings):
     SIZE_DESCRIPTION: str = "Amount elements on the page"
 
 
+# TODO например добавить логирование для get ручек
 class LoggingSettings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_FORMATTER: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

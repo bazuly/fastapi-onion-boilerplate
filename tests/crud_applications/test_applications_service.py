@@ -1,9 +1,10 @@
+import uuid
 from datetime import datetime
 
 import pytest
 from unittest.mock import AsyncMock
 from app.applications.service import ApplicationService
-from app.applications.schema import ApplicationCreateSchema, ApplicationResponseSchema
+from app.applications.schemas import ApplicationCreateSchema, ApplicationResponseSchema
 from fastapi.exceptions import HTTPException
 
 
@@ -11,6 +12,7 @@ from fastapi.exceptions import HTTPException
 async def test_create_application__success():
     mock_repository = AsyncMock()
     mock_kafka = AsyncMock()
+    user_id = uuid.uuid4()
 
     mock_repository.create_application.return_value = AsyncMock(
         id=1,
@@ -20,10 +22,10 @@ async def test_create_application__success():
     )
     service = ApplicationService(mock_repository, mock_kafka)
     app_data = ApplicationCreateSchema(
-        user_name="test_user",
+        title="test_user",
         description="Test",
     )
-    result = await service.create_application(app_data)
+    result = await service.create_application(app_data, user_id)
     mock_kafka.produce.assert_called_once()
     assert isinstance(result, ApplicationResponseSchema)
     assert result.kafka_status is True
@@ -33,6 +35,7 @@ async def test_create_application__success():
 async def test_create_application__failure():
     mock_repo = AsyncMock()
     mock_kafka = AsyncMock()
+    user_id = uuid.uuid4()
 
     mock_kafka.produce.side_effect = Exception("Kafka error")
     mock_repo.create_application.return_value = AsyncMock(
@@ -42,34 +45,35 @@ async def test_create_application__failure():
         created_at=datetime.utcnow()
     )
     service = ApplicationService(mock_repo, mock_kafka)
-    app_data = ApplicationCreateSchema(user_name="test_user", description="Test")
+    app_data = ApplicationCreateSchema(title="test_user", description="Test")
 
-    result = await service.create_application(app_data)
+    result = await service.create_application(app_data, user_id)
 
     assert result.kafka_status is False
 
 
 @pytest.mark.asyncio
-async def test_get_application_by_username__success():
+async def test_get_application_by_title__success():
     mock_repo = AsyncMock()
     mock_kafka = AsyncMock()
+    user_id = uuid.uuid4()
 
     mock_repo.create_application.return_value = AsyncMock(
         id=1,
-        user_name="test_user",
+        title="test_title",
         description="Test",
         created_at=datetime.utcnow()
     )
     service = ApplicationService(mock_repo, mock_kafka)
-    app_data = ApplicationCreateSchema(user_name="test_user", description="Test")
-    created_data = await service.create_application(app_data)
+    app_data = ApplicationCreateSchema(title="test_title", description="Test")
+    created_data = await service.create_application(app_data, user_id)
 
-    get_application_case = await service.get_application_by_user_name(created_data.user_name, page=1, size=1)
+    get_application_case = await service.get_application_by_title(created_data.title)
     assert get_application_case is not None
 
 
 @pytest.mark.asyncio
-async def test_get_application_by_username__failure():
+async def test_get_application_by_title__failure():
     mock_repo = AsyncMock()
     mock_kafka = AsyncMock()
 
@@ -81,7 +85,7 @@ async def test_get_application_by_username__failure():
     )
     service = ApplicationService(mock_repo, mock_kafka)
 
-    get_application_case = await service.get_application_by_user_name("incorrect_username", page=1, size=1)
+    get_application_case = await service.get_application_by_title("incorrect_title")
     assert get_application_case == []
 
 
@@ -93,13 +97,13 @@ async def test_get_all_applications__success():
     test_data = [
         AsyncMock(
             id=1,
-            user_name="test_user_1",
+            title="test_user_1",
             description="Test",
             created_at=datetime.utcnow()
         ),
         AsyncMock(
             id=2,
-            user_name="test_user_2",
+            title="test_user_2",
             description="Test",
             created_at=datetime.utcnow()
         )
@@ -110,8 +114,8 @@ async def test_get_all_applications__success():
     result = await service.get_all_applications(page=1, size=10)
 
     assert len(result) == 2
-    assert result[0].user_name == "test_user_1"
-    assert result[1].user_name == "test_user_2"
+    assert result[0].title == "test_user_1"
+    assert result[1].title == "test_user_2"
 
 
 @pytest.mark.asyncio

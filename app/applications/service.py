@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Any
+from uuid import UUID
 
 from fastapi import HTTPException
 
-from app.applications.schema import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
+from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
 from app.applications.repository.application_repository import ApplicationRepository
 from app.broker.producer import KafkaProducer
 from settings import settings
@@ -21,15 +22,20 @@ class ApplicationService:
     application_repository: ApplicationRepository
     kafka_producer: KafkaProducer
 
-    async def create_application(self, body: ApplicationCreateSchema) -> ApplicationResponseSchema:
+    async def create_application(
+            self,
+            body: ApplicationCreateSchema,
+            user_id: UUID,
+    ) -> ApplicationResponseSchema:
 
-        created_application = await self.application_repository.create_application(body)
+        created_application = await self.application_repository.create_application(body, user_id)
 
         message = {
             "id": created_application.id,
-            "user_name": created_application.user_name,
+            "title": created_application.title,
             "description": created_application.description,
-            "created_at": datetime.utcnow().isoformat()
+            "created_at": datetime.utcnow().isoformat(),
+            "user_id": str(user_id),
         }
 
         kafka_status = False
@@ -45,20 +51,24 @@ class ApplicationService:
 
         return ApplicationResponseSchema(
             id=created_application.id,
-            user_name=created_application.user_name,
+            title=created_application.title,
             description=created_application.description,
             created_at=created_application.created_at,
             kafka_status=kafka_status
         )
 
-    async def get_application_by_user_name(self, user_name: str, page: int, size: int) -> List[ApplicationSchema]:
-        applications = await self.application_repository.get_application_by_username(
-            user_name=user_name,
-            page=page,
-            size=size
+    async def get_application_by_id(self, application_id: int) -> ApplicationSchema:
+        application = await self.application_repository.get_application_by_id(application_id)
+        if not application:
+            raise HTTPException(status_code=404, detail="Application not found")
+        return ApplicationSchema.model_validate(application)
+
+    async def get_application_by_title(self, title: str) -> List[ApplicationSchema]:
+        applications = await self.application_repository.get_application_by_title(
+            title=title,
         )
         if not applications:
-            raise HTTPException(status_code=404, detail=f"No applications found for user: {user_name}")
+            raise HTTPException(status_code=404, detail=f"No applications found titled {title}")
 
         return [ApplicationSchema.model_validate(app) for app in applications]
 
@@ -67,3 +77,35 @@ class ApplicationService:
         if not applications:
             raise HTTPException(status_code=404, detail=f"No applications found")
         return [ApplicationSchema.model_validate(app) for app in applications]
+
+    async def delete_user_application(self, application_id: int, user_id: UUID) -> dict:
+        try:
+            return await self.application_repository.delete_user_application(
+                application_id=application_id,
+                user_id=user_id
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error deleting application: {str(e)}"
+            )
+
+    async def edit_application(
+            self,
+            application_id: int,
+            user_id: UUID,
+            new_title: str | None = None,
+            new_description: str | None = None,
+
+    ) -> ApplicationSchema:
+        updated_application = await self.application_repository.edit_application_info(
+            application_id=application_id,
+            user_id=user_id,
+            new_title=new_title,
+            new_description=new_description
+        )
+        if not updated_application:
+            raise HTTPException(status_code=404, detail=f"No application found for user: {user_id}")
+        return ApplicationSchema.model_validate(updated_application)
