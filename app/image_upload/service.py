@@ -57,8 +57,6 @@ class ImageService:
         except:
             raise HTTPException(status_code=404, detail="Image not found")
 
-    # TODO нужно ли здесь добавлять логику удаления изображения из самой директории ?
-    # TODO по идее должно быть в репозитории данная логика
     async def delete_image_by_id(self, image_id: int) -> dict:
         try:
             await self.image_repository.delete_image_by_id(image_id)
