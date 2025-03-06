@@ -8,7 +8,9 @@ from app.image_upload.service import ImageService
 from app.infrastructure.database import get_db_connection
 from app.image_upload.repository.image_repository import ImageRepository
 
-from settings import settings
+from settings import get_settings
+
+settings = get_settings()
 
 
 async def get_kafka_producer() -> KafkaProducer:
@@ -17,7 +19,9 @@ async def get_kafka_producer() -> KafkaProducer:
     return producer
 
 
-async def get_application_repository(db_session: AsyncSession = Depends(get_db_connection)) -> ApplicationRepository:
+async def get_application_repository(
+        db_session: AsyncSession = Depends(get_db_connection)
+) -> ApplicationRepository:
     return ApplicationRepository(db_session=db_session)
 
 
@@ -31,7 +35,9 @@ async def get_application_service(
     )
 
 
-async def get_image_upload_repository(db_session: AsyncSession = Depends(get_db_connection)) -> ImageRepository:
+async def get_image_upload_repository(
+        db_session: AsyncSession = Depends(get_db_connection)
+) -> ImageRepository:
     return ImageRepository(db_session=db_session, upload_dir=settings.IMAGE_UPLOAD_DIR)
 
 
