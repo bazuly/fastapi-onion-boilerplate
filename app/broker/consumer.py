@@ -18,6 +18,7 @@ class KafkaConsumer:
             value_deserializer=lambda v: json.loads(v.decode())
         )
         await self.consumer.start()
+        asyncio.create_task(self.consume_messages())
 
     async def stop(self):
         if self.consumer:
