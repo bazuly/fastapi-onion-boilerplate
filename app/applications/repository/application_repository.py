@@ -7,12 +7,14 @@ from fastapi import HTTPException
 
 from app.applications.schemas import ApplicationCreateSchema
 from app.applications.models import ApplicationModel
+from app.logger import logger
 
 
 class ApplicationRepository:
 
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
+        self.logger = logger.getChild("repository.application_repository")  # path?
 
     async def create_application(
             self,
@@ -32,6 +34,9 @@ class ApplicationRepository:
             result = await session.execute(query)
             await session.commit()
             added_application = result.scalar_one_or_none()
+            self.logger.info(
+                "Application added by user: s%", user_id
+            )
             return added_application
 
     @staticmethod
@@ -51,6 +56,14 @@ class ApplicationRepository:
         query = select(ApplicationModel).where(ApplicationModel.id == application_id)
         async with self.db_session as session:
             application: ApplicationModel = (await session.execute(query)).scalar_one_or_none()
+            if not application:
+                self.logger.warning(
+                    "Application does not exist"
+                )
+                raise HTTPException(status_code=404, detail="Application not found")
+            self.logger.info(
+                "Application found by id: %s", application_id
+            )
         return application
 
     async def get_all_applications(
@@ -64,7 +77,9 @@ class ApplicationRepository:
             result = await session.execute(query)
             applications = result.scalars().all()
             if not applications:
+                self.logger.warning("No applications found")
                 raise HTTPException(status_code=404, detail="No applications found")
+
         return applications
 
     async def get_application_by_title(
@@ -75,7 +90,11 @@ class ApplicationRepository:
         async with self.db_session as session:
             result = await session.execute(query)
             if not result:
+                self.logger.warning("No application found with title: %s", title)
                 raise HTTPException(status_code=404, detail="No applications found")
+            self.logger.info(
+                "Application found with title: %s", title
+            )
             return result.scalars().all()
 
     async def delete_user_application(
@@ -93,13 +112,25 @@ class ApplicationRepository:
             application = result.scalar_one_or_none()
 
             if not application:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Application not found or access denied"
+                self.logger.warning(
+                    "Application delete attempt failed",
+                    extra={
+                        "application_id": application_id,
+                        "user_id": str(user_id),
+                        "reason": "not_found_or_access_denied"
+                    }
                 )
+                raise HTTPException(status_code=404, detail="Application not found")
 
             delete_query = delete(ApplicationModel).where(
                 ApplicationModel.id == application_id
+            )
+            self.logger.info(
+                "Application deleted",
+                extra={
+                    "application_id": application_id,
+                    "user_id": str(user_id),
+                }
             )
             await session.execute(delete_query)
             await session.commit()
@@ -121,6 +152,14 @@ class ApplicationRepository:
             )
 
             if not application:
+                self.logger.warning(
+                    "Application edit attempt failed",
+                    extra={
+                        "application_id": application_id,
+                        "user_id": str(user_id),
+                        "reason": "not_found_or_access_denied"
+                    }
+                )
                 raise HTTPException(status_code=404, detail="Application not found or access denied")
 
             update_data = {}
@@ -134,6 +173,14 @@ class ApplicationRepository:
                     update(ApplicationModel)
                     .where(ApplicationModel.id == application_id)
                     .values(**update_data)
+                )
+                self.logger.info(
+                    "Application updated",
+                    extra={
+                        "application_id": application_id,
+                        "user_id": str(user_id),
+                        "update_data": update_data,
+                    }
                 )
                 await session.commit()
                 await session.refresh(application)

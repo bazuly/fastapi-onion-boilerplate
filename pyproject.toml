@@ -30,7 +30,8 @@ dependencies = [
     "aiosqlite (>=0.21.0,<0.22.0)",
     "logging (>=0.4.9.6,<0.5.0.0)",
     "tree (>=0.2.4,<0.3.0)",
-    "fastapi-users[sqlalchemy] (>=14.0.1,<15.0.0)"
+    "fastapi-users[sqlalchemy] (>=14.0.1,<15.0.0)",
+    "python-json-logger (>=3.3.0,<4.0.0)"
 ]
 
 
