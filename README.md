@@ -21,7 +21,7 @@ An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
    cp .env.example .env
    docker-compose up -d --build
    docker-compose exec web alembic upgrade head
-   docker-compose exec web alembic alembic revision --autogenerate -m "migration_name"
+   docker-compose exec web alembic revision --autogenerate -m "migration_name"
     
 2. Web service will be : http://localhost:8000/docs/
 
@@ -39,6 +39,7 @@ An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
 
     AsyncPG - async drivere for PostgreSQL
 
+
 🐳 Docker Compose
 
 Service:
@@ -55,3 +56,9 @@ Additional docs:
 - https://docs.pydantic.dev/latest/ Pydantic
 - https://fastapi-users.github.io/fastapi-users/latest/ FastAPI users
 - https://docs.python.org/3/library/asyncio.html asyncio python
+
+    web - FastAPI приложение (порт 8000)
+    db - PostgreSQL (порт 5432)
+    kafka - Kafka брокер (порт 9092)
+    zookeeper - Zookeeper для Kafka (порт 2181)
+
