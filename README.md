@@ -56,8 +56,4 @@ Additional docs:
 - https://fastapi-users.github.io/fastapi-users/latest/ FastAPI users
 - https://docs.python.org/3/library/asyncio.html asyncio python
 
-    web - FastAPI приложение (порт 8000)
-    db - PostgreSQL (порт 5432)
-    kafka - Kafka брокер (порт 9092)
-    zookeeper - Zookeeper для Kafka (порт 2181)
 
