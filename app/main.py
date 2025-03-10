@@ -27,7 +27,12 @@ async def lifespan(app: FastAPI):
     await consumer.stop()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    swagger_ui_parameters={
+        "syntaxHighlight.theme": "monokai"
+    }
+)
 
 app.include_router(applications_router)
 app.include_router(image_upload_router)

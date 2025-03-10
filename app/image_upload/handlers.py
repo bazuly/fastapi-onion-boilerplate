@@ -37,7 +37,7 @@ async def get_uploaded_image(
     return await image_service.get_image_by_id(image_id)
 
 
-@router.get(
+@router.delete(
     "/image_delete/{image_id}",
     response_model=None,
 )
@@ -46,4 +46,4 @@ async def delete_uploaded_image(
         image_service: Annotated[ImageService, Depends(get_image_upload_service)],
         user: User = Depends(current_user),
 ) -> status.HTTP_204_NO_CONTENT:
-    return await image_service.delete_image_by_id(image_id)
+    return await image_service.delete_image_by_id(image_id, user.id)
