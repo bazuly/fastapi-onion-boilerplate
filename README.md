@@ -37,7 +37,7 @@ An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
 
     Docker - containerization
 
-    AsyncPG - async drivere for PostgreSQL
+    AsyncPG - async driver for PostgreSQL
 
 
 🐳 Docker Compose
