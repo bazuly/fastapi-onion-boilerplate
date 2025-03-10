@@ -1,58 +1,63 @@
-# FastAPI Application Service
+# FastAPI Application Service DDD
 
-Микросервис для управления заявками, построенный на FastAPI с использованием PostgreSQL, Docker и Kafka.
+An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
 
-## 🚀 Быстрый старт
+## 🚀 Quick start
 
-### Требования
+### Requirements
 
 - Docker
 - Docker Compose
+- Kafka
+- Make utils (Does not support Windows)
 - Python 3.11+
 
-### Установка и запуск
+### Installation and launch
 
-1. Клонируйте репозиторий:
+1. Clone repository:
    ```bash
-   git clone https://github.com/yourusername/fastapi-app-service.git
-   cd fastapi-app-service
+   git clone https://github.com/yourusername/fastAPI-kafka-example.git
+   cd fastAPI-kafka-example
    cp .env.example .env
    docker-compose up -d --build
    docker-compose exec web alembic upgrade head
    docker-compose exec web alembic revision --autogenerate -m "migration_name"
     
-2. Сервис будет доступен по адресу: http://localhost:8000/docs/
+2. Web service will be : http://localhost:8000/docs/
 
-🛠 Технологии
+🛠 Techs
 
-    FastAPI - веб-фреймворк
+    FastAPI - web framework
 
-    PostgreSQL - основная база данных
+    PostgreSQL - main database 
 
-    Alembic - управление миграциями
+    Alembic - magration service
 
-    Kafka - обработка событий
+    Kafka - event processing
 
-    Docker - контейнеризация
+    Docker - containerization
 
-    AsyncPG - асинхронный драйвер для PostgreSQL
+    AsyncPG - async drivere for PostgreSQL
 
-📚 API Endpoints
-
-1. Создание новой заявки
-   - POST /applications/
-
-2. Получить список заявок.
-   - GET /applications/?page=1&size=10
-
-4. Получить заявки по имени пользователя.
-   - GET /applications/{user_name}?page=1&size=10
 
 🐳 Docker Compose
 
-Сервисы:
+Service:
+
+    web - FastAPI app (port 8000)
+    db - PostgreSQL (port 5432)
+    kafka - Kafka broker (port 9092)
+    zookeeper - Zookeeper for Kafka (port 2181)
+
+Additional docs:
+
+- https://docs.python.org/3/howto/logging.html Python logger
+- https://docs.pydantic.dev/latest/ Pydantic
+- https://fastapi-users.github.io/fastapi-users/latest/ FastAPI users
+- https://docs.python.org/3/library/asyncio.html asyncio python
 
     web - FastAPI приложение (порт 8000)
     db - PostgreSQL (порт 5432)
     kafka - Kafka брокер (порт 9092)
     zookeeper - Zookeeper для Kafka (порт 2181)
+
