@@ -55,13 +55,16 @@ class ImageService:
             image = await self.image_repository.get_image_by_id(image_id)
             return image
         except:
-            raise HTTPException(status_code=404, detail="Image not found")
+            raise HTTPException(status_code=404, detail="Image not found or access denied")
 
-    async def delete_image_by_id(self, image_id: int) -> dict:
+    async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
         try:
-            await self.image_repository.delete_image_by_id(image_id)
+            await self.image_repository.delete_image_by_id(
+                image_id=image_id,
+                user_id=user_id
+            )
             return {
                 "msg": f"Image {image_id} deleted successfully"
             }
         except:
-            raise HTTPException(status_code=404, detail="Image not found")
+            raise HTTPException(status_code=404, detail="Image not found or access denied")

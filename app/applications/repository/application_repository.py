@@ -14,7 +14,7 @@ class ApplicationRepository:
 
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
-        self.logger = logger.getChild("repository.application_repository")  # path?
+        self.logger = logger.getChild("repository.application_repository")
 
     async def create_application(
             self,
@@ -112,7 +112,7 @@ class ApplicationRepository:
             application = result.scalar_one_or_none()
 
             if not application:
-                self.logger.warning(
+                self.logger.error(
                     "Application delete attempt failed",
                     extra={
                         "application_id": application_id,
