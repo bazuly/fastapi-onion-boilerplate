@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.image_upload.models import ImageUploadModel
 from app.logger import logger
-from app.exceptions import ImageUploadRepositoryException
+from app.exceptions import RepositoryError, ImageNotFoundError
 
 
 class ImageRepository:
@@ -55,8 +55,7 @@ class ImageRepository:
                 exc_info=True
             )
             await self.db_session.rollback()
-            print(image.filename)
-            raise ImageUploadRepositoryException.database_query_error()
+            raise
 
     async def get_image_by_id(self, image_id: int) -> ImageUploadModel | None:
         try:
@@ -75,7 +74,7 @@ class ImageRepository:
                 "Database error fetching image",
                 extra={"image_id": image_id, "error": str(e)},
             )
-            raise ImageUploadRepositoryException.image_not_found_error(image_id)
+            raise ImageNotFoundError(image_id)
 
     async def delete_image_by_id(self, image_id: int | UUID, user_id: UUID) -> None:
         try:
@@ -115,11 +114,11 @@ class ImageRepository:
                 exc_info=True
             )
             await self.db_session.rollback()
-            raise ImageUploadRepositoryException.database_query_error()
+            raise ImageNotFoundError(image_id)
 
-        except Exception as e:
-            self.logger.warning(
+        except RepositoryError as e:
+            self.logger.error(
                 "Delete attempt for non-existent image",
                 extra={"image_id": image_id, "error": str(e)},
             )
-            raise ImageUploadRepositoryException.image_not_found_error(image_id)
+            raise ImageNotFoundError(image_id)

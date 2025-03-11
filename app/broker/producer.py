@@ -1,5 +1,8 @@
-from aiokafka import AIOKafkaProducer
 import json
+from aiokafka import AIOKafkaProducer
+
+from app.exceptions import ProducerError
+from app.logger import logger
 
 
 class KafkaProducer:
@@ -21,7 +24,7 @@ class KafkaProducer:
     async def produce(self, topic: str, key: str, value: dict):
 
         if not self.producer:
-            raise RuntimeError("Kafka Producer stopped")
+            raise ProducerError("Kafka Producer stopped")
 
         await self.producer.send_and_wait(topic, value=value, key=key.encode('utf-8'))
         print(f"Message sent to  {topic}: {value}")

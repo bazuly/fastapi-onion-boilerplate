@@ -4,6 +4,7 @@ from aiokafka import AIOKafkaConsumer
 import asyncio
 
 from settings import settings
+from app.exceptions import ConsumerError
 
 
 class KafkaConsumer:
@@ -25,17 +26,16 @@ class KafkaConsumer:
             await self.consumer.stop()
 
     async def consume_messages(self):
-        while True:
-            try:
-                async for msg in self.consumer:
-                    print("\n" + "=" * 50)
-                    print(f"Received Kafka message:")
-                    print(f"Topic: {msg.topic}")
-                    print(f"Key: {msg.key.decode()}")
-                    print(f"Value: {msg.value}")
-                    print(f"Partition: {msg.partition}")
-                    print(f"Offset: {msg.offset}")
-                    print("=" * 50 + "\n")
-            except Exception as e:
-                print(f"Consumer error: {str(e)}")
-                await asyncio.sleep(2)
+        try:
+            async for msg in self.consumer:
+                print("\n" + "=" * 50)
+                print(f"Received Kafka message:")
+                print(f"Topic: {msg.topic}")
+                print(f"Key: {msg.key.decode()}")
+                print(f"Value: {msg.value}")
+                print(f"Partition: {msg.partition}")
+                print(f"Offset: {msg.offset}")
+                print("=" * 50 + "\n")
+        except ConsumerError as e:
+            print(f"Consumer error: {str(e)}")
+            await asyncio.sleep(2)
