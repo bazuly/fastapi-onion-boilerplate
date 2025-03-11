@@ -4,6 +4,7 @@ from typing import List, Any
 from uuid import UUID
 
 from fastapi import HTTPException
+from kafka.errors import KafkaError
 
 from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
 from app.applications.repository.application_repository import ApplicationRepository
@@ -48,7 +49,7 @@ class ApplicationService:
                 value=message
             )
             kafka_status = True
-        except Exception as e:
+        except KafkaError as e:
             self.logger.warning(
                 "Error while sending message to Kafka: {}".format(e),
             )
@@ -97,12 +98,13 @@ class ApplicationService:
                 application_id=application_id,
                 user_id=user_id
             )
+
         except HTTPException as e:
-            raise e
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error deleting application: {str(e)}"
+            self.logger.error(
+                "Error while deleting user application:",
+                extra={
+                    "error_detail": str(e)
+                }
             )
 
     async def edit_application(

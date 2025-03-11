@@ -3,11 +3,13 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import HTTPException
+from kafka.errors import KafkaError
 
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository.image_repository import ImageRepository
 from app.image_upload.schemas import ImageResponse
 from app.broker.producer import KafkaProducer
+from app.logger import logger
 from settings import settings
 
 
@@ -15,6 +17,7 @@ from settings import settings
 class ImageService:
     image_repository: ImageRepository
     kafka_producer: KafkaProducer
+    logger: logger
 
     async def upload_image(
             self,
@@ -39,32 +42,37 @@ class ImageService:
                 value=kafka_message
             )
             kafka_status = True
-        except Exception as e:
-            print(f"Error while sending kafka message: {e}")
-
-        return ImageResponse(
-            id=uploaded_image.id,
-            filename=uploaded_image.filename,
-            size=uploaded_image.size,
-            upload_date=uploaded_image.upload_date,
-            kafka_status=kafka_status,
-        )
-
-    async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
-        try:
-            image = await self.image_repository.get_image_by_id(image_id)
-            return image
-        except:
-            raise HTTPException(status_code=404, detail="Image not found or access denied")
-
-    async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
-        try:
-            await self.image_repository.delete_image_by_id(
-                image_id=image_id,
-                user_id=user_id
+        except KafkaError as e:
+            self.logger(
+                "Fail while kafka producing error",
+                extra={
+                    "error": str(e)
+                }
             )
-            return {
-                "msg": f"Image {image_id} deleted successfully"
-            }
-        except:
-            raise HTTPException(status_code=404, detail="Image not found or access denied")
+
+            return ImageResponse(
+                id=uploaded_image.id,
+                filename=uploaded_image.filename,
+                size=uploaded_image.size,
+                upload_date=uploaded_image.upload_date,
+                kafka_status=kafka_status,
+            )
+
+        async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
+            try:
+                image = await self.image_repository.get_image_by_id(image_id)
+                return image
+            except:
+                raise HTTPException(status_code=404, detail="Image not found or access denied")
+
+        async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
+            try:
+                await self.image_repository.delete_image_by_id(
+                    image_id=image_id,
+                    user_id=user_id
+                )
+                return {
+                    "msg": f"Image {image_id} deleted successfully"
+                }
+            except:
+                raise HTTPException(status_code=404, detail="Image not found or access denied")

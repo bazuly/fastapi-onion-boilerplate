@@ -2,11 +2,13 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from kafka.errors import KafkaError
 
 from app.applications.handlers import router as applications_router
 from app.image_upload.handlers import router as image_upload_router
 from app.users.auth.handlers import router as users_router
 from app.broker.consumer import KafkaConsumer
+from app.logger import logger
 
 consumer = KafkaConsumer()
 
@@ -17,8 +19,11 @@ async def lifespan(app: FastAPI):
         try:
             await consumer.start()
             break
-        except Exception as e:
+        except KafkaError as e:
             await asyncio.sleep(2)
+            logger.error(
+                "Unexpected error during Kafka connection: %s", str(e)
+            )
     else:
         raise RuntimeError("Failed to connect to Kafka")
 

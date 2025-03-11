@@ -1,6 +1,8 @@
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from settings import Settings
+from app.exceptions import RepositoryError
 
 settings = Settings()
 
@@ -15,8 +17,8 @@ async def get_db_session() -> AsyncSession:
         try:
             yield session
             await session.commit()
-        except Exception as e:
+        except SQLAlchemyError() as e:
             await session.rollback()
-            raise e
+            raise RepositoryError(f"Database error: {str(e)}") from e
         finally:
             await session.close()
