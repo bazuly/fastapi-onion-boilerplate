@@ -53,22 +53,31 @@ class RepositoryError(DatabaseError):
 
 class KafkaError(Exception):
     """Base exception for Kafka consumer/producer errors."""
-    pass
+    default_message = "Kafka error occurred."
+
+    def __init__(self, details: str = None):
+        self.details = details
+        message = self.default_message
+        if details:
+            message += f" Details: {details}"
+        super().__init__(message)
 
 
 class ConsumerError(KafkaError):
-    def __init__(self, details: str = None):
-        self.details = details
-        message = "Failed to consume message, reload..."
-        if details:
-            message += f" Details: {details}"
-        super().__init__(message)
+    default_message = "Failed to consume message, break."
 
 
 class ProducerError(KafkaError):
-    def __init__(self, details: str = None):
-        self.details = details
-        message = "Failed to produce message, reload..."
-        if details:
-            message += f" Details: {details}"
-        super().__init__(message)
+    default_message = "Failed to produce message, reload..."
+
+
+class KafkaMessageError(KafkaError):
+    default_message = "Failed to send message, break..."
+
+
+class KafkaLifeSpawnError(KafkaError):
+    default_message = "Failed to start up app, reload in 2 seconds..."
+
+
+class KafkaImageDataUploadError(KafkaError):
+    default_message = "Failed to send image data"
