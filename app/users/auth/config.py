@@ -3,8 +3,8 @@ import uuid
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport
 
-from app.users.auth.models import User
 from app.users.auth.core.security import get_jwt_strategy
+from app.users.auth.models import User
 from .user_dependency import get_user_manager
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")

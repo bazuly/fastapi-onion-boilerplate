@@ -1,12 +1,12 @@
 from typing import Sequence
 from uuid import UUID
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, select, update, delete
 from fastapi import HTTPException
+from sqlalchemy import insert, select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.applications.schemas import ApplicationCreateSchema
 from app.applications.models import ApplicationModel
+from app.applications.schemas import ApplicationCreateSchema
 from app.logger import logger
 
 

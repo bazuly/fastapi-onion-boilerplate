@@ -1,11 +1,11 @@
 import os
+from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from unittest.mock import AsyncMock
 
 from app.infrastructure.database.database import Base
 

@@ -1,10 +1,10 @@
+import asyncio
 import json
 
 from aiokafka import AIOKafkaConsumer
-import asyncio
 
-from settings import settings
 from app.exceptions import ConsumerError
+from settings import settings
 
 
 class KafkaConsumer:

@@ -5,11 +5,11 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
 from app.applications.repository.application_repository import ApplicationRepository
+from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
 from app.broker.producer import KafkaProducer
-from app.logger import logger
 from app.exceptions import KafkaMessageError
+from app.logger import logger
 from settings import settings
 
 
