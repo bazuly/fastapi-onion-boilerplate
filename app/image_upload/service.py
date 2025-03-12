@@ -3,13 +3,14 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import HTTPException
-from kafka.errors import KafkaError
 
+from app.exceptions import KafkaImageDataUploadError
+from app.broker.producer import KafkaProducer
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository.image_repository import ImageRepository
 from app.image_upload.schemas import ImageResponse
-from app.broker.producer import KafkaProducer
 from app.logger import logger
+
 from settings import settings
 
 
@@ -42,7 +43,7 @@ class ImageService:
                 value=kafka_message
             )
             kafka_status = True
-        except KafkaError as e:
+        except KafkaImageDataUploadError as e:
             self.logger(
                 "Fail while kafka producing error",
                 extra={
