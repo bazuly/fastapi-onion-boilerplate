@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime
+from unittest.mock import AsyncMock
 
 import pytest
-from unittest.mock import AsyncMock
-from app.applications.service import ApplicationService
-from app.applications.schemas import ApplicationCreateSchema, ApplicationResponseSchema
 from fastapi.exceptions import HTTPException
+
+from app.applications.schemas import ApplicationCreateSchema, ApplicationResponseSchema
+from app.applications.service import ApplicationService
 
 
 @pytest.mark.asyncio

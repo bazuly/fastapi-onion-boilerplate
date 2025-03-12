@@ -1,9 +1,10 @@
-import pytest
 import uuid
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.applications.repository.application_repository import ApplicationRepository
 from app.applications.models import ApplicationModel
+from app.applications.repository.application_repository import ApplicationRepository
 from app.applications.schemas import ApplicationCreateSchema
 from tests.utils.utils import random_lower_string
 

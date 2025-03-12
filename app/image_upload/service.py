@@ -4,13 +4,12 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from app.exceptions import KafkaImageDataUploadError
 from app.broker.producer import KafkaProducer
+from app.exceptions import KafkaImageDataUploadError
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository.image_repository import ImageRepository
 from app.image_upload.schemas import ImageResponse
 from app.logger import logger
-
 from settings import settings
 
 
@@ -59,21 +58,21 @@ class ImageService:
                 kafka_status=kafka_status,
             )
 
-        async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
-            try:
-                image = await self.image_repository.get_image_by_id(image_id)
-                return image
-            except:
-                raise HTTPException(status_code=404, detail="Image not found or access denied")
+    async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
+        try:
+            image = await self.image_repository.get_image_by_id(image_id)
+            return image
+        except:
+            raise HTTPException(status_code=404, detail="Image not found or access denied")
 
-        async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
-            try:
-                await self.image_repository.delete_image_by_id(
-                    image_id=image_id,
-                    user_id=user_id
-                )
-                return {
-                    "msg": f"Image {image_id} deleted successfully"
-                }
-            except:
-                raise HTTPException(status_code=404, detail="Image not found or access denied")
+    async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
+        try:
+            await self.image_repository.delete_image_by_id(
+                image_id=image_id,
+                user_id=user_id
+            )
+            return {
+                "msg": f"Image {image_id} deleted successfully"
+            }
+        except:
+            raise HTTPException(status_code=404, detail="Image not found or access denied")

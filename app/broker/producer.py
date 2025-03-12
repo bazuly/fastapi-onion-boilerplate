@@ -1,8 +1,8 @@
 import json
+
 from aiokafka import AIOKafkaProducer
 
 from app.exceptions import ProducerError
-from app.logger import logger
 
 
 class KafkaProducer:

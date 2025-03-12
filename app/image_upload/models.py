@@ -14,5 +14,3 @@ class ImageUploadModel(Base):
     upload_date: Mapped[DateTime] = mapped_column(DateTime, default=datetime.utcnow)
     size: Mapped[float] = mapped_column(Float, comment="File size in mb")
     user_id = Column(SQLUUID, nullable=False)
-
-

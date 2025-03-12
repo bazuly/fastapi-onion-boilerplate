@@ -1,16 +1,16 @@
 import os
-import aiofiles
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
+import aiofiles
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exceptions import RepositoryError, ImageNotFoundError
 from app.image_upload.models import ImageUploadModel
 from app.logger import logger
-from app.exceptions import RepositoryError, ImageNotFoundError
 
 
 class ImageRepository:
