@@ -75,9 +75,5 @@ class KafkaMessageError(KafkaError):
     default_message = "Failed to send message, break..."
 
 
-class KafkaLifeSpawnError(KafkaError):
-    default_message = "Failed to start up app, reload in 2 seconds..."
-
-
 class KafkaImageDataUploadError(KafkaError):
     default_message = "Failed to send image data"
