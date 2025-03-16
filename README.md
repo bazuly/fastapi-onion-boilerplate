@@ -2,6 +2,10 @@
 
 An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
 
+Goals:
+- Complete tests
+
+
 ## 🚀 Quick start
 
 ### Requirements
