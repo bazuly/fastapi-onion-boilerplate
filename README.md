@@ -1,4 +1,4 @@
-# FastAPI Application Service DDD
+# FastAPI Application Service
 
 An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
 
@@ -61,4 +61,5 @@ Additional docs:
 - https://fastapi-users.github.io/fastapi-users/latest/ FastAPI users
 - https://docs.python.org/3/library/asyncio.html asyncio python
 
-
+🔍 Tags:
+#fastapi #python #restapi #jwt #sqlalchemy #docker #testing #kafka #boilerplate
