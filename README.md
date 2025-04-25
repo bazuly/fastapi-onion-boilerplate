@@ -60,6 +60,3 @@ Additional docs:
 - https://docs.pydantic.dev/latest/ Pydantic
 - https://fastapi-users.github.io/fastapi-users/latest/ FastAPI users
 - https://docs.python.org/3/library/asyncio.html asyncio python
-
-🔍 Tags:
-#fastapi #python #restapi #jwt #sqlalchemy #docker #testing #kafka #boilerplate
