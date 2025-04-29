@@ -4,7 +4,7 @@ import json
 from aiokafka import AIOKafkaConsumer
 
 from app.exceptions import ConsumerError
-from settings import settings
+from app.settings import settings
 
 
 class KafkaConsumer:

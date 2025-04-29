@@ -1,4 +1,5 @@
 from typing import Sequence
+import logging 
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -7,14 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.applications.models import ApplicationModel
 from app.applications.schemas import ApplicationCreateSchema
-from app.logger import logger
+
+logger = logging.getLogger(__name__)
 
 
 class ApplicationRepository:
 
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
-        self.logger = logger.getChild("repository.application_repository")
+        self.logger = logger
 
     async def create_application(
             self,
@@ -35,7 +37,7 @@ class ApplicationRepository:
             await session.commit()
             added_application = result.scalar_one_or_none()
             self.logger.info(
-                "Application added by user: s%", user_id
+                "Application added by user: %s", user_id
             )
             return added_application
 

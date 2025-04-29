@@ -2,7 +2,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from app.exceptions import RepositoryError
-from settings import Settings
+from app.settings import Settings
 
 settings = Settings()
 

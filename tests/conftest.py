@@ -60,6 +60,6 @@ def override_settings(monkeypatch):
     monkeypatch.setenv("DB_PASSWORD", "testpass")
     monkeypatch.setenv("DB_NAME", "testdb")
 
-    from settings import get_settings
+    from app.settings import get_settings
     settings = get_settings()
     settings.model_rebuild()

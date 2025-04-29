@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -9,9 +10,9 @@ from app.exceptions import KafkaImageDataUploadError
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository.image_repository import ImageRepository
 from app.image_upload.schemas import ImageResponse
-from app.logger import logger
-from settings import settings
+from app.settings import settings
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ImageService:

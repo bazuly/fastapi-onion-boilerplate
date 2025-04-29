@@ -19,7 +19,7 @@ services:
   tests:
     build: .
     env_file: .env.test
-    command: pytest -v tests/
+    command: .venv/bin/pytest -v tests/
     environment:
       - APP_DB_DRIVER=postgresql+asyncpg
       - APP_DB_HOST=db-test

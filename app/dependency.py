@@ -7,7 +7,7 @@ from app.broker.producer import KafkaProducer
 from app.image_upload.repository.image_repository import ImageRepository
 from app.image_upload.service import ImageService
 from app.infrastructure.database import get_db_connection
-from settings import get_settings
+from app.settings import get_settings
 
 settings = get_settings()
 

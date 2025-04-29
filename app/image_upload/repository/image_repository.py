@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -10,14 +11,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import RepositoryError, ImageNotFoundError
 from app.image_upload.models import ImageUploadModel
-from app.logger import logger
+
+logger = logging.getLogger(__name__)
 
 
 class ImageRepository:
     def __init__(self, db_session: AsyncSession, upload_dir: str):
         self.db_session = db_session
         self.upload_dir = upload_dir
-        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger = logger
 
     async def upload_image(self, image: Any, user_id: UUID) -> ImageUploadModel:
         try:

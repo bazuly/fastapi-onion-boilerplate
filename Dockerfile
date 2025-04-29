@@ -10,16 +10,16 @@ RUN apt update -y && \
     libpq-dev \
     nmap
 
-RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 -
-ENV PATH="/opt/poetry/bin:$PATH"
-RUN poetry config virtualenvs.create false
+RUN pip install uv
 
 WORKDIR /app
-COPY pyproject.toml poetry.lock* ./
-
-RUN poetry install --no-root --no-interaction --no-ansi
-
-COPY . .
+COPY pyproject.toml README.md ./
+COPY app/ app/
 COPY tests/ tests/
 
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+RUN uv venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+RUN uv pip install -e ".[dev]"
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]w

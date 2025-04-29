@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime
+import logging
+import datetime
 from unittest.mock import AsyncMock
 
 import pytest
@@ -7,7 +8,9 @@ from fastapi.exceptions import HTTPException
 
 from app.applications.schemas import ApplicationCreateSchema, ApplicationResponseSchema
 from app.applications.service import ApplicationService
+from app.exceptions import KafkaMessageError
 
+logger = logging.getLogger(__name__)
 
 @pytest.mark.asyncio
 async def test_create_application__success():
@@ -19,10 +22,10 @@ async def test_create_application__success():
         id=1,
         title="test_title",
         description="Test",
-        created_at=datetime.utcnow(),
+        created_at=datetime.datetime.now(datetime.UTC),
         user_id=user_id,
     )
-    service = ApplicationService(mock_repository, mock_kafka)
+    service = ApplicationService(mock_repository, mock_kafka, logger)
     app_data = ApplicationCreateSchema(
         title="test_user",
         description="Test",
@@ -39,15 +42,15 @@ async def test_create_application__failure():
     mock_kafka = AsyncMock()
     user_id = uuid.uuid4()
 
-    mock_kafka.produce.side_effect = Exception("Kafka error")
+    mock_kafka.produce.side_effect = KafkaMessageError()
     mock_repo.create_application.return_value = AsyncMock(
         id=1,
         title="test_title",
         description="Test",
-        created_at=datetime.utcnow(),
+        created_at=datetime.datetime.now(datetime.UTC),
         user_id=user_id,
     )
-    service = ApplicationService(mock_repo, mock_kafka)
+    service = ApplicationService(mock_repo, mock_kafka, logger)
     app_data = ApplicationCreateSchema(title="test_title", description="Test")
 
     result = await service.create_application(app_data, user_id)
@@ -65,9 +68,9 @@ async def test_get_application_by_title__success():
         id=1,
         title="test_title",
         description="Test",
-        created_at=datetime.utcnow()
+        created_at=datetime.datetime.now(datetime.UTC)
     )
-    service = ApplicationService(mock_repo, mock_kafka)
+    service = ApplicationService(mock_repo, mock_kafka, logger)
     app_data = ApplicationCreateSchema(title="test_title", description="Test")
     created_data = await service.create_application(app_data, user_id)
 
@@ -84,10 +87,10 @@ async def test_get_application_by_title__failure():
         id=1,
         user_name="correct_username",
         description="Test",
-        created_at=datetime.utcnow()
+        created_at=datetime.datetime.now(datetime.UTC)
 
     )
-    service = ApplicationService(mock_repo, mock_kafka)
+    service = ApplicationService(mock_repo, mock_kafka, logger)
 
     get_application_case = await service.get_application_by_title("incorrect_title")
     assert get_application_case == []
@@ -103,17 +106,17 @@ async def test_get_all_applications__success():
             id=1,
             title="test_user_1",
             description="Test",
-            created_at=datetime.utcnow()
+            created_at=datetime.datetime.now(datetime.UTC)
         ),
         AsyncMock(
             id=2,
             title="test_user_2",
             description="Test",
-            created_at=datetime.utcnow()
+            created_at=datetime.datetime.now(datetime.UTC)
         )
     ]
     mock_repo.get_all_applications.return_value = test_data
-    service = ApplicationService(mock_repo, mock_kafka)
+    service = ApplicationService(mock_repo, mock_kafka, logger)
 
     result = await service.get_all_applications(page=1, size=10)
 
@@ -129,7 +132,7 @@ async def test_get_all_applications__empty():
 
     mock_repo.get_all_applications.return_value = []
 
-    service = ApplicationService(mock_repo, mock_kafka)
+    service = ApplicationService(mock_repo, mock_kafka, logger)
 
     with pytest.raises(HTTPException) as exc_info:
         await service.get_all_applications(page=1, size=10)

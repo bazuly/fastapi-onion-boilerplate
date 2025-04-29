@@ -1,5 +1,6 @@
+import datetime
+import logging
 from dataclasses import dataclass
-from datetime import datetime
 from typing import List, Any
 from uuid import UUID
 
@@ -9,8 +10,9 @@ from app.applications.repository.application_repository import ApplicationReposi
 from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
 from app.broker.producer import KafkaProducer
 from app.exceptions import KafkaMessageError
-from app.logger import logger
-from settings import settings
+from app.settings import settings
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -37,7 +39,7 @@ class ApplicationService:
             "id": created_application.id,
             "title": created_application.title,
             "description": created_application.description,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.datetime.now(datetime.UTC),
             "user_id": str(user_id),
         }
 

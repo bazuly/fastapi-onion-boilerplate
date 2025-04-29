@@ -7,7 +7,7 @@ from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema,
 from app.applications.service import ApplicationService
 from app.dependency import get_application_service
 from app.users.auth.models import User
-from settings import DescriptionSettings
+from app.settings import DescriptionSettings
 
 router = APIRouter(prefix="/applications", tags=["applications"])
 settings = DescriptionSettings()

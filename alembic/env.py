@@ -4,11 +4,8 @@ import asyncio
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from settings import Settings
-from app.infrastructure.database import Base
+from app.settings import Settings
 
-from app.applications.models import *
-from app.image_upload.models import *
 from app.users.auth.models import *
 
 # this is the Alembic Config object, which provides

@@ -5,7 +5,7 @@ from fastapi import Request
 from fastapi_users import BaseUserManager, UUIDIDMixin
 
 from app.users.auth.models import User
-from settings import settings
+from app.settings import settings
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
