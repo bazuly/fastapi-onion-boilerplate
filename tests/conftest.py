@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from app.infrastructure.database.database import Base
+from tests.utils.factories import ApplicationFactory
 
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
@@ -63,3 +64,15 @@ def override_settings(monkeypatch):
     from app.settings import get_settings
     settings = get_settings()
     settings.model_rebuild()
+
+
+@pytest.fixture(autouse=True)
+def setup_factories(db_session: AsyncSession):
+    ApplicationFactory._meta.sqlalchemy_session = db_session
+
+
+
+
+
+
+
