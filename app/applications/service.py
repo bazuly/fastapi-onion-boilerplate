@@ -1,7 +1,7 @@
 import datetime
 import logging
 from dataclasses import dataclass
-from typing import List, Any
+from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -86,7 +86,7 @@ class ApplicationService:
         return [ApplicationSchema.model_validate(app) for app in applications]
 
     async def get_all_applications(self, page: int, size: int) -> List[ApplicationSchema]:
-        applications: Any = await self.application_repository.get_all_applications(page=page, size=size)
+        applications: List[ApplicationSchema] = await self.application_repository.get_all_applications(page=page, size=size)
         if not applications:
             self.logger.error(
                 "No applications found"

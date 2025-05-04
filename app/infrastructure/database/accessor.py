@@ -17,7 +17,7 @@ async def get_db_session() -> AsyncSession:
         try:
             yield session
             await session.commit()
-        except SQLAlchemyError() as e:
+        except SQLAlchemyError as e:
             await session.rollback()
             raise RepositoryError(f"Database error: {str(e)}") from e
         finally:

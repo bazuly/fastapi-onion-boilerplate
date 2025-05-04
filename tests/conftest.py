@@ -1,4 +1,5 @@
 import os
+import tempfile
 from unittest.mock import AsyncMock
 
 import pytest
@@ -8,7 +9,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from app.infrastructure.database.database import Base
-from tests.utils.factories import ApplicationFactory
+from tests.utils.factories import ApplicationFactory, ImageFactory
+from tests.utils.utils import random_lower_string
 
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
@@ -67,12 +69,27 @@ def override_settings(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def setup_factories(db_session: AsyncSession):
+def application_factory(db_session: AsyncSession):
     ApplicationFactory._meta.sqlalchemy_session = db_session
 
 
+@pytest.fixture(autouse=True)
+def image_factory(db_session: AsyncSession):
+    ImageFactory._meta.sqlalchemy_session = db_session
 
 
+@pytest.fixture
+def mock_file():
+    class MockFile:
+        filename = random_lower_string() + ".jpg"
+
+        async def read(self):
+            return b"fake content"
+
+    return MockFile()
 
 
-
+@pytest.fixture
+def tmp_upload_dir():
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        yield tmp_dir

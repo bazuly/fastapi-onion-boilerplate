@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from factory.alchemy import SQLAlchemyModelFactory
-from factory.fuzzy import FuzzyText
+from factory.fuzzy import FuzzyText, FuzzyFloat
 from faker import Faker
 from faker.providers import misc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +13,7 @@ from factory import (
 )
 
 from app.applications.models import ApplicationModel
+from app.image_upload.models import ImageUploadModel
 
 
 fake = Faker()
@@ -54,8 +55,14 @@ class ApplicationFactory(BaseFactory):
         model = ApplicationModel
 
 
+class ImageFactory(BaseFactory):
+    """ Image factory model. """
 
+    filename = Sequence(lambda n: f"image_{n}.jpg")
+    upload_date = LazyFunction(datetime.now)
+    size = FuzzyFloat(0.1, 1024.0)
+    user_id = LazyFunction(uuid.uuid4)
 
-
-
+    class Meta:
+        model = ImageUploadModel 
 

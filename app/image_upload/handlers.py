@@ -14,15 +14,15 @@ router = APIRouter(prefix="/image_upload", tags=["image_upload"])
 
 @router.post(
     "/image_upload",
-    response_model=ImageResponse,
 )
 async def upload_image(
         image_service: Annotated[ImageService, Depends(get_image_upload_service)],
         image: UploadFile = File(...),
         user: User = Depends(current_user),
 
-) -> ImageResponse:
-    return await image_service.upload_image(image, user.id)
+):
+    await image_service.upload_image(image, user.id)
+    return {"message": f"Image: {image.filename} added succesfully"}
 
 
 @router.get(

@@ -1,3 +1,4 @@
+import logging
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +11,7 @@ from app.infrastructure.database import get_db_connection
 from app.settings import get_settings
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 async def get_kafka_producer() -> KafkaProducer:
@@ -31,6 +33,7 @@ async def get_application_service(
     return ApplicationService(
         application_repository=application_repository,
         kafka_producer=kafka_producer,
+        logger=logger
     )
 
 
@@ -47,4 +50,5 @@ async def get_image_upload_service(
     return ImageService(
         image_repository=image_upload_repository,
         kafka_producer=kafka_producer,
+        logger=logger
     )
