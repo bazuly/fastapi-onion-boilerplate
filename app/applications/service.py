@@ -1,13 +1,14 @@
 import datetime
 import logging
 from dataclasses import dataclass
-from typing import List
+from typing import List, Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
 
 from app.applications.repository.application_repository import ApplicationRepository
 from app.applications.schemas import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema
+from app.applications.models import ApplicationModel
 from app.broker.producer import KafkaProducer
 from app.exceptions import KafkaMessageError
 from app.settings import settings
@@ -86,7 +87,7 @@ class ApplicationService:
         return [ApplicationSchema.model_validate(app) for app in applications]
 
     async def get_all_applications(self, page: int, size: int) -> List[ApplicationSchema]:
-        applications: List[ApplicationSchema] = await self.application_repository.get_all_applications(page=page, size=size)
+        applications: Sequence[ApplicationModel] = await self.application_repository.get_all_applications(page=page, size=size)
         if not applications:
             self.logger.error(
                 "No applications found"
@@ -94,7 +95,7 @@ class ApplicationService:
             raise HTTPException(status_code=404, detail=f"No applications found")
         return [ApplicationSchema.model_validate(app) for app in applications]
 
-    async def delete_user_application(self, application_id: int, user_id: UUID) -> dict:
+    async def delete_user_application(self, application_id: int, user_id: UUID):
         try:
             return await self.application_repository.delete_user_application(
                 application_id=application_id,
@@ -108,6 +109,7 @@ class ApplicationService:
                     "error_detail": str(e)
                 }
             )
+            return None
 
     async def edit_application(
             self,

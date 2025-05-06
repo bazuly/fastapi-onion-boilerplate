@@ -45,5 +45,5 @@ async def delete_uploaded_image(
         image_id: int,
         image_service: Annotated[ImageService, Depends(get_image_upload_service)],
         user: User = Depends(current_user),
-) -> status.HTTP_204_NO_CONTENT:
+):
     return await image_service.delete_image_by_id(image_id, user.id)
