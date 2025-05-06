@@ -1,11 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, UploadFile, File, status
+from fastapi import APIRouter, Depends, UploadFile, File
 
 from app.app_config import current_user
 from app.dependency import get_image_upload_service
 from app.image_upload.models import ImageUploadModel
-from app.image_upload.schemas import ImageResponse, ImageCreateBase
+from app.image_upload.schemas import ImageCreateBase
 from app.image_upload.service import ImageService
 from app.users.auth.models import User
 
