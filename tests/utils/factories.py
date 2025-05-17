@@ -7,7 +7,7 @@ from faker import Faker
 from faker.providers import misc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from factory import (
+from factory.declarations import (
     LazyFunction,
     Sequence,
 )
@@ -21,6 +21,8 @@ fake.add_provider(misc)
 
 
 class AsyncSQLAlchemyModelFactory(SQLAlchemyModelFactory):
+    # переопределяем метод _create из фактори на асинхронный лад
+    # pyright нааверняка будет ругаться :) 
     @classmethod
     async def _create(cls, model_class, *args, **kwargs):
         session: AsyncSession = cls._meta.sqlalchemy_session

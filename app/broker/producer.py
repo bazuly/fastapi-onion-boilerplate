@@ -13,7 +13,7 @@ class KafkaProducer:
     async def start(self):
         self.producer = AIOKafkaProducer(
             bootstrap_servers=self.bootstrap_servers,
-            value_serializer=lambda x: json.dumps(x).encode('utf-8')
+            value_serializer=lambda x: json.dumps(x, indent=4, sort_keys=True, default=str).encode('utf-8')
         )
         await self.producer.start()
 

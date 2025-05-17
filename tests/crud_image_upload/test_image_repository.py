@@ -33,7 +33,7 @@ class TestImageRepository:
         assert result.id == image.id
         assert result.filename == image.filename
 
-    async def test_get_image_not_found(self) -> None:
+    async def test_get_image_not_found(self) -> None | ImageNotFoundError:
         try:
             await self.repo.get_image_by_id(999)
         except:

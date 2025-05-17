@@ -51,15 +51,15 @@ class ImageService:
                 }
             )
 
-            return ImageResponse(
-                id=uploaded_image.id,
-                filename=uploaded_image.filename,
-                size=uploaded_image.size,
-                upload_date=uploaded_image.upload_date,
-                kafka_status=kafka_status,
-            )
+        return ImageResponse(
+            id=uploaded_image.id,
+            filename=uploaded_image.filename,
+            size=uploaded_image.size,
+            upload_date=uploaded_image.upload_date,
+            kafka_status=kafka_status,
+        )
 
-    async def get_image_by_id(self, image_id: int) -> ImageUploadModel:
+    async def get_image_by_id(self, image_id: int) -> ImageUploadModel | None:
         try:
             image = await self.image_repository.get_image_by_id(image_id)
             return image

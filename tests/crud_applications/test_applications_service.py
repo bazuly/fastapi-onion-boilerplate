@@ -8,8 +8,10 @@ from app.applications.schemas import ApplicationResponseSchema
 from app.applications.service import ApplicationService
 from app.exceptions import KafkaMessageError
 from tests.utils.factories import ApplicationFactory
+from tests.utils.utils import kafka_error_detail
 
 logger = logging.getLogger(__name__)
+
 
 
 @pytest.mark.asyncio
@@ -33,7 +35,7 @@ async def test_create_application__failure():
     mock_repo = AsyncMock()
     mock_kafka = AsyncMock()
 
-    mock_kafka.produce.side_effect = KafkaMessageError()
+    mock_kafka.produce.side_effect = KafkaMessageError(details=kafka_error_detail)
     data = await ApplicationFactory.create()
 
     mock_repo.create_application.return_value = data
