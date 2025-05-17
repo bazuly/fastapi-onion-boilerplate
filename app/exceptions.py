@@ -9,7 +9,7 @@ class BaseAppError(Exception):
 class ApplicationNotFound(BaseAppError):
     """Exception raised when an application cannot be found."""
 
-    def __init__(self, user_name: str = None):
+    def __init__(self, user_name: str):
         self.user_name = user_name
         message = f"Application for '{user_name}' not found." if user_name else "No available applications."
         super().__init__(message)
@@ -27,7 +27,6 @@ class ImageNotFoundError(ImageUploadError):
         self.image_id = image_id
         super().__init__(f"Image not found. ID: {image_id}")
 
-
 class DatabaseError(Exception):
     """Base exception for all database errors."""
     pass
@@ -36,7 +35,7 @@ class DatabaseError(Exception):
 class DatabaseConnectionError(DatabaseError):
     """Exception raised when a database connection cannot be established."""
 
-    def __init__(self, details: str = None):
+    def __init__(self, details: str):
         self.details = details
         message = "Failed to connect to database."
         if details:
@@ -55,7 +54,7 @@ class KafkaError(Exception):
     """Base exception for Kafka consumer/producer errors."""
     default_message = "Kafka error occurred."
 
-    def __init__(self, details: str = None):
+    def __init__(self, details: str):
         self.details = details
         message = self.default_message
         if details:

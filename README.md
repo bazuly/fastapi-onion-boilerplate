@@ -29,6 +29,10 @@ Goals:
     
 2. Web service will be : http://localhost:8000/docs/
 
+3. Test boilerplate app:
+   ```bash
+   docker compose - docker-compose-test.yaml up --build
+
 🛠 Techs
 
     FastAPI - web framework

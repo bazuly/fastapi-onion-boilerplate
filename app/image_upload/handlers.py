@@ -21,8 +21,7 @@ async def upload_image(
         user: User = Depends(current_user),
 
 ):
-    await image_service.upload_image(image, user.id)
-    return {"message": f"Image: {image.filename} added succesfully"}
+    return await image_service.upload_image(image, user.id)
 
 
 @router.get(
@@ -33,7 +32,7 @@ async def get_uploaded_image(
         image_id: int,
         image_service: Annotated[ImageService, Depends(get_image_upload_service)],
         user: User = Depends(current_user),
-) -> ImageUploadModel:
+) -> ImageUploadModel | None:
     return await image_service.get_image_by_id(image_id)
 
 
