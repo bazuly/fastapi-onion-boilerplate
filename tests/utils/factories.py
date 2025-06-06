@@ -3,8 +3,6 @@ from datetime import datetime
 
 from factory.alchemy import SQLAlchemyModelFactory
 from factory.fuzzy import FuzzyText, FuzzyFloat
-from faker import Faker
-from faker.providers import misc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from factory.declarations import (
@@ -16,13 +14,8 @@ from app.applications.models import ApplicationModel
 from app.image_upload.models import ImageUploadModel
 
 
-fake = Faker()
-fake.add_provider(misc)
-
-
 class AsyncSQLAlchemyModelFactory(SQLAlchemyModelFactory):
-    # переопределяем метод _create из фактори на асинхронный лад
-    # pyright нааверняка будет ругаться :) 
+    # redifine method create as async method
     @classmethod
     async def _create(cls, model_class, *args, **kwargs):
         session: AsyncSession = cls._meta.sqlalchemy_session
@@ -37,7 +30,7 @@ class AsyncSQLAlchemyModelFactory(SQLAlchemyModelFactory):
 
 
 class BaseFactory(AsyncSQLAlchemyModelFactory):
-    """ Base factory. """
+    """Base factory."""
 
     class Meta:
         abstract = True
@@ -46,7 +39,7 @@ class BaseFactory(AsyncSQLAlchemyModelFactory):
 
 
 class ApplicationFactory(BaseFactory):
-    """ Application factory model """
+    """Application factory model"""
 
     title = Sequence(lambda n: f"application{n}")
     description = FuzzyText()
@@ -58,7 +51,7 @@ class ApplicationFactory(BaseFactory):
 
 
 class ImageFactory(BaseFactory):
-    """ Image factory model. """
+    """Image factory model."""
 
     filename = Sequence(lambda n: f"image_{n}.jpg")
     upload_date = LazyFunction(datetime.now)
@@ -66,5 +59,4 @@ class ImageFactory(BaseFactory):
     user_id = LazyFunction(uuid.uuid4)
 
     class Meta:
-        model = ImageUploadModel 
-
+        model = ImageUploadModel

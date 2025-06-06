@@ -12,6 +12,7 @@ from app.infrastructure.database.database import Base
 from tests.utils.factories import ApplicationFactory, ImageFactory
 from tests.utils.utils import random_lower_string
 
+
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
 )
@@ -20,6 +21,7 @@ TEST_DATABASE_URL = os.getenv(
 @pytest.fixture(autouse=True)
 def mock_kafka():
     from app.broker import consumer
+
     consumer.KafkaConsumer = AsyncMock()
     yield
 
@@ -32,9 +34,7 @@ async def db_session():
     transaction = await connection.begin()
 
     session_maker = sessionmaker(
-        bind=connection,
-        class_=AsyncSession,
-        expire_on_commit=False
+        bind=connection, class_=AsyncSession, expire_on_commit=False
     )
     session = session_maker()
 
@@ -51,6 +51,7 @@ async def db_session():
 @pytest.fixture
 def client():
     from app.main import app
+
     app.dependency_overrides = {}
     return TestClient(app)
 
@@ -64,6 +65,7 @@ def override_settings(monkeypatch):
     monkeypatch.setenv("DB_NAME", "testdb")
 
     from app.settings import get_settings
+
     settings = get_settings()
     settings.model_rebuild()
 
