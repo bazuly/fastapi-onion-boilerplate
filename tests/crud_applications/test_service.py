@@ -13,7 +13,6 @@ from tests.utils.utils import kafka_error_detail
 logger = logging.getLogger(__name__)
 
 
-
 @pytest.mark.asyncio
 async def test_create_application__success():
     mock_repository = AsyncMock()
@@ -107,5 +106,4 @@ async def test_get_all_applications__empty():
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "No applications found"
-
     mock_repo.get_all_applications.assert_awaited_once_with(page=1, size=10)

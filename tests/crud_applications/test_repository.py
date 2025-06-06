@@ -1,11 +1,8 @@
-import uuid
-
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.applications.repository.application_repository import ApplicationRepository
 from app.applications.schemas import ApplicationCreateSchema
-from tests.utils.utils import random_lower_string
 from tests.utils.factories import ApplicationFactory
 
 
@@ -13,16 +10,17 @@ from tests.utils.factories import ApplicationFactory
 async def test_create_application__success(db_session: AsyncSession):
     repository = ApplicationRepository(db_session)
 
-    generated_title = random_lower_string()
-    generated_description = random_lower_string()
-    user_id = uuid.uuid4()
+    raw_data = await ApplicationFactory.create()
+    title = raw_data.title
+    description = raw_data.description
+    user_id = raw_data.user_id
 
-    application_data = ApplicationCreateSchema(title=generated_title, description=generated_description)
+    application_data = ApplicationCreateSchema(title=title, description=description)
     created_app = await repository.create_application(application_data, user_id)
 
     assert created_app.id is not None
-    assert created_app.title == generated_title
-    assert created_app.description == generated_description
+    assert created_app.title == raw_data.title
+    assert created_app.description == raw_data.description
 
 
 @pytest.mark.asyncio

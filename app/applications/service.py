@@ -92,7 +92,7 @@ class ApplicationService:
             self.logger.error(
                 "No applications found"
             )
-            raise HTTPException(status_code=404, detail=f"No applications found")
+            raise HTTPException(status_code=404, detail="No applications found")
         return [ApplicationSchema.model_validate(app) for app in applications]
 
     async def delete_user_application(self, application_id: int, user_id: UUID):

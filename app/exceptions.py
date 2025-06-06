@@ -3,6 +3,7 @@ from uuid import UUID
 
 class BaseAppError(Exception):
     """Base exception for all application errors."""
+
     pass
 
 
@@ -11,12 +12,17 @@ class ApplicationNotFound(BaseAppError):
 
     def __init__(self, user_name: str):
         self.user_name = user_name
-        message = f"Application for '{user_name}' not found." if user_name else "No available applications."
+        message = (
+            f"Application for '{user_name}' not found."
+            if user_name
+            else "No available applications."
+        )
         super().__init__(message)
 
 
 class ImageUploadError(Exception):
     """Base exception for all image upload errors."""
+
     pass
 
 
@@ -27,8 +33,10 @@ class ImageNotFoundError(ImageUploadError):
         self.image_id = image_id
         super().__init__(f"Image not found. ID: {image_id}")
 
+
 class DatabaseError(Exception):
     """Base exception for all database errors."""
+
     pass
 
 
@@ -52,6 +60,7 @@ class RepositoryError(DatabaseError):
 
 class KafkaError(Exception):
     """Base exception for Kafka consumer/producer errors."""
+
     default_message = "Kafka error occurred."
 
     def __init__(self, details: str):

@@ -6,9 +6,6 @@ Create Date: 2025-02-27 09:14:41.497905
 
 """
 from typing import Sequence, Union
-import fastapi_users_db_sqlalchemy
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.

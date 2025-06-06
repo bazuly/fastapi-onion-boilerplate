@@ -14,6 +14,7 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
+
 async def get_kafka_producer() -> KafkaProducer:
     producer = KafkaProducer(bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS)
     await producer.start()

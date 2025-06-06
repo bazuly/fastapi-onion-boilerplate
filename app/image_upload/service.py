@@ -32,7 +32,7 @@ class ImageService:
             "id": uploaded_image.id,
             "filename": uploaded_image.filename,
             "size": uploaded_image.size,
-            "upload_date": uploaded_image.upload_date.isoformat(),
+            "upload_date": uploaded_image.upload_date,
             "user_id": str(user_id)
         }
         kafka_status = False

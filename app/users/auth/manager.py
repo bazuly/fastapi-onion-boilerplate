@@ -12,17 +12,15 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = settings.SECRET_KEY
     verification_token_secret = settings.SECRET_KEY
 
-    async def on_after_register(
-            self, user: User, request: Optional[Request] = None
-    ):
+    async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
 
     async def on_after_forgot_password(
-            self, user: User, token: str, request: Optional[Request] = None
+        self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"User {user.id} has forgot their password. Token: {token}")
 
     async def on_after_request_verify(
-            self, user: User, token: str, request: Optional[Request] = None
+        self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Token: {token}")

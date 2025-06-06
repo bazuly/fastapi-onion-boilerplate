@@ -1,5 +1,5 @@
-import uuid
 import os
+import uuid
 
 import pytest
 import pytest_asyncio
@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions import ImageNotFoundError
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository.image_repository import ImageRepository
-from tests.conftest import tmp_upload_dir
 from tests.utils.factories import ImageFactory
 
 
@@ -20,7 +19,9 @@ class TestImageRepository:
         ImageFactory._meta.sqlalchemy_session = db_session
         self.user_id = uuid.uuid4()
 
-    async def test_upload_image__success(self, mock_file, db_session, tmp_upload_dir) -> None:
+    async def test_upload_image__success(
+        self, mock_file, db_session, tmp_upload_dir
+    ) -> None:
         result = await self.repo.upload_image(mock_file, self.user_id)
 
         assert isinstance(result, ImageUploadModel)
@@ -36,10 +37,12 @@ class TestImageRepository:
     async def test_get_image_not_found(self) -> None | ImageNotFoundError:
         try:
             await self.repo.get_image_by_id(999)
-        except:
+        except Exception as e:  # noqa
             raise ImageNotFoundError(999)
 
-    async def test_delete_image__success(self, mock_file, db_session, tmp_upload_dir) -> None:
+    async def test_delete_image__success(
+        self, mock_file, db_session, tmp_upload_dir
+    ) -> None:
         image = await self.repo.upload_image(mock_file, self.user_id)
         file_path = os.path.join(self.repo.upload_dir, image.filename)
         open(file_path, "w").close()

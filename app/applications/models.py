@@ -6,7 +6,7 @@ from app.infrastructure.database import Base
 
 
 class ApplicationModel(Base):
-    __tablename__ = 'applications'
+    __tablename__ = "applications"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     title = Column(String, index=True, nullable=False)
