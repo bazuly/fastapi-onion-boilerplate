@@ -1,8 +1,9 @@
 from typing import Sequence
-import logging 
+import logging
 from uuid import UUID
 
 from fastapi import HTTPException
+from fastapi_cache.decorator import cache
 from sqlalchemy import insert, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,15 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 class ApplicationRepository:
-
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
         self.logger = logger
 
     async def create_application(
-            self,
-            application: ApplicationCreateSchema,
-            user_id: UUID
+        self, application: ApplicationCreateSchema, user_id: UUID
     ) -> ApplicationModel:
         query = (
             insert(ApplicationModel)
@@ -36,20 +34,16 @@ class ApplicationRepository:
             result = await session.execute(query)
             await session.commit()
             added_application = result.scalar_one_or_none()
-            self.logger.info(
-                "Application added by user: %s", user_id
-            )
+            self.logger.info("Application added by user: %s", user_id)
             return added_application
 
     @staticmethod
+    @cache(expire=120)
     async def get_user_application(
-            application_id: int,
-            user_id: UUID,
-            session: AsyncSession
+        application_id: int, user_id: UUID, session: AsyncSession
     ) -> ApplicationModel:
         query = select(ApplicationModel).where(
-            ApplicationModel.id == application_id,
-            ApplicationModel.user_id == user_id
+            ApplicationModel.id == application_id, ApplicationModel.user_id == user_id
         )
         result = await session.execute(query)
         return result.scalar_one_or_none()
@@ -57,21 +51,20 @@ class ApplicationRepository:
     async def get_application_by_id(self, application_id: int) -> ApplicationModel:
         query = select(ApplicationModel).where(ApplicationModel.id == application_id)
         async with self.db_session as session:
-            application: ApplicationModel = (await session.execute(query)).scalar_one_or_none()
+            application: ApplicationModel = (
+                await session.execute(query)
+            ).scalar_one_or_none()
             if not application:
-                self.logger.warning(
-                    "Application does not exist"
-                )
+                self.logger.warning("Application does not exist")
                 raise HTTPException(status_code=404, detail="Application not found")
-            self.logger.info(
-                "Application found by id: %s", application_id
-            )
+            self.logger.info("Application found by id: %s", application_id)
         return application
 
+    @cache(expire=120)
     async def get_all_applications(
-            self,
-            page: int,
-            size: int,
+        self,
+        page: int,
+        size: int,
     ) -> Sequence[ApplicationModel]:
         offset = (page - 1) * size
         async with self.db_session as session:
@@ -84,9 +77,10 @@ class ApplicationRepository:
 
         return applications
 
+    @cache(expire=120)
     async def get_application_by_title(
-            self,
-            title: str,
+        self,
+        title: str,
     ) -> Sequence[ApplicationModel]:
         query = select(ApplicationModel).where(ApplicationModel.title == title)
         async with self.db_session as session:
@@ -94,19 +88,12 @@ class ApplicationRepository:
             if not result:
                 self.logger.warning("No application found with title: %s", title)
                 raise HTTPException(status_code=404, detail="No applications found")
-            self.logger.info(
-                "Application found with title: %s", title
-            )
+            self.logger.info("Application found with title: %s", title)
             return result.scalars().all()
 
-    async def delete_user_application(
-            self,
-            application_id: int,
-            user_id: UUID
-    ) -> dict:
+    async def delete_user_application(self, application_id: int, user_id: UUID) -> dict:
         query = select(ApplicationModel).where(
-            ApplicationModel.id == application_id,
-            ApplicationModel.user_id == user_id
+            ApplicationModel.id == application_id, ApplicationModel.user_id == user_id
         )
 
         async with self.db_session as session:
@@ -119,8 +106,8 @@ class ApplicationRepository:
                     extra={
                         "application_id": application_id,
                         "user_id": str(user_id),
-                        "reason": "not_found_or_access_denied"
-                    }
+                        "reason": "not_found_or_access_denied",
+                    },
                 )
                 raise HTTPException(status_code=404, detail="Application not found")
 
@@ -132,7 +119,7 @@ class ApplicationRepository:
                 extra={
                     "application_id": application_id,
                     "user_id": str(user_id),
-                }
+                },
             )
             await session.execute(delete_query)
             await session.commit()
@@ -140,17 +127,15 @@ class ApplicationRepository:
         return {"status": "success", "message": "Application deleted"}
 
     async def edit_application_info(
-            self,
-            application_id: int,
-            user_id: UUID,
-            new_title: str | None = None,
-            new_description: str | None = None,
+        self,
+        application_id: int,
+        user_id: UUID,
+        new_title: str | None = None,
+        new_description: str | None = None,
     ) -> ApplicationModel:
         async with self.db_session as session:
             application = await self.get_user_application(
-                application_id,
-                user_id,
-                session
+                application_id, user_id, session
             )
 
             if not application:
@@ -159,10 +144,12 @@ class ApplicationRepository:
                     extra={
                         "application_id": application_id,
                         "user_id": str(user_id),
-                        "reason": "not_found_or_access_denied"
-                    }
+                        "reason": "not_found_or_access_denied",
+                    },
                 )
-                raise HTTPException(status_code=404, detail="Application not found or access denied")
+                raise HTTPException(
+                    status_code=404, detail="Application not found or access denied"
+                )
 
             update_data = {}
             if new_title is not None:
@@ -182,7 +169,7 @@ class ApplicationRepository:
                         "application_id": application_id,
                         "user_id": str(user_id),
                         "update_data": update_data,
-                    }
+                    },
                 )
                 await session.commit()
                 await session.refresh(application)
