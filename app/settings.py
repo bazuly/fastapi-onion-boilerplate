@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = "password"
     DB_NAME: str = "postgres"
     # =========================================================
-    KAFKA_BOOTSTRAP_SERVERS: str = 'kafka:19092'
+    KAFKA_BOOTSTRAP_SERVERS: str = "kafka:19092"
     KAFKA_TOPIC: str = "applications"
     KAFKA_GROUP_ID: str = "api-group"
     # =========================================================
@@ -21,11 +21,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "SECRET_KEY"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # =========================================================
+    CACHE_HOST: str = "redis"
+    CACHE_PORT: int = "6379"
+    CACHE_DB: int = 0
 
     model_config = SettingsConfigDict(
-        env_file="../.env",
-        extra="ignore",
-        case_sensitive=False
+        env_file="../.env", extra="ignore", case_sensitive=False
     )
 
     @property
