@@ -32,15 +32,12 @@ async def lifespan(app: FastAPI):
             logger.info("Attempting to connect to Redis...")
             pool = ConnectionPool.from_url(url="redis://cache:6379/0")
             r = redis.Redis(connection_pool=pool)
-            print("r nizhe")
-            print(r)
             await r.ping()
             FastAPICache.init(
                 RedisBackend(r),
                 prefix="fastapi-cache:",
                 expire=60,
             )
-            print("pizda")  # TODO удалить
             logger.info("Successfully connected to Redis and initialized cache")
             break
         except RedisError as e:
