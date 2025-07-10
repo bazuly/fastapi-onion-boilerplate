@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.settings import Settings
 
-from app.users.auth.models import *
-from app.applications.models import *
-from app.image_upload.models import *
+from app.users.auth.models import *  # noqa
+from app.applications.models import *  # noqa
+from app.image_upload.models import *  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +23,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = Base.metadata  # noqa
 
 
 # other values from the config, defined by the needs of env.py,

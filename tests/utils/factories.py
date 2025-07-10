@@ -1,3 +1,5 @@
+# The above code defines factory classes for creating instances of SQLAlchemy models asynchronously in
+# Python.
 import uuid
 from datetime import datetime
 

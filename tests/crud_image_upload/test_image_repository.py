@@ -16,6 +16,7 @@ class TestImageRepository:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, tmp_upload_dir: str, db_session: AsyncSession):
         self.repo = ImageRepository(db_session, tmp_upload_dir)
+        # Set the session for the factory
         ImageFactory._meta.sqlalchemy_session = db_session
         self.user_id = uuid.uuid4()
 
@@ -25,7 +26,8 @@ class TestImageRepository:
         result = await self.repo.upload_image(mock_file, self.user_id)
 
         assert isinstance(result, ImageUploadModel)
-        assert os.path.exists(os.path.join(self.repo.upload_dir, mock_file.filename))
+        assert os.path.exists(os.path.join(
+            self.repo.upload_dir, mock_file.filename))
 
     async def test_get_image__success(self, mock_file, db_session) -> None:
         image = await self.repo.upload_image(mock_file, self.user_id)

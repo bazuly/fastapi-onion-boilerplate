@@ -1,3 +1,6 @@
+# The `ApplicationRepository` class provides methods for interacting with application data in a
+# database, including creating, retrieving, updating, and deleting applications, with caching
+# functionality implemented for certain operations.
 from typing import Sequence
 import logging
 from uuid import UUID
@@ -49,14 +52,16 @@ class ApplicationRepository:
         return result.scalar_one_or_none()
 
     async def get_application_by_id(self, application_id: int) -> ApplicationModel:
-        query = select(ApplicationModel).where(ApplicationModel.id == application_id)
+        query = select(ApplicationModel).where(
+            ApplicationModel.id == application_id)
         async with self.db_session as session:
             application: ApplicationModel = (
                 await session.execute(query)
             ).scalar_one_or_none()
             if not application:
                 self.logger.warning("Application does not exist")
-                raise HTTPException(status_code=404, detail="Application not found")
+                raise HTTPException(
+                    status_code=404, detail="Application not found")
             self.logger.info("Application found by id: %s", application_id)
         return application
 
@@ -73,7 +78,8 @@ class ApplicationRepository:
             applications = result.scalars().all()
             if not applications:
                 self.logger.warning("No applications found")
-                raise HTTPException(status_code=404, detail="No applications found")
+                raise HTTPException(
+                    status_code=404, detail="No applications found")
 
         return applications
 
@@ -86,8 +92,10 @@ class ApplicationRepository:
         async with self.db_session as session:
             result = await session.execute(query)
             if not result:
-                self.logger.warning("No application found with title: %s", title)
-                raise HTTPException(status_code=404, detail="No applications found")
+                self.logger.warning(
+                    "No application found with title: %s", title)
+                raise HTTPException(
+                    status_code=404, detail="No applications found")
             self.logger.info("Application found with title: %s", title)
             return result.scalars().all()
 
@@ -109,7 +117,8 @@ class ApplicationRepository:
                         "reason": "not_found_or_access_denied",
                     },
                 )
-                raise HTTPException(status_code=404, detail="Application not found")
+                raise HTTPException(
+                    status_code=404, detail="Application not found")
 
             delete_query = delete(ApplicationModel).where(
                 ApplicationModel.id == application_id

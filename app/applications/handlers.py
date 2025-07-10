@@ -1,4 +1,27 @@
+"""
+    This FastAPI router defines endpoints for CRUD operations on applications with appropriate request
+    and response models.
+    
+    :param body: The `body` parameter in the `post_application` function represents the request body
+    data that is expected to be in the format defined by the `ApplicationCreateSchema`. It contains
+    information needed to create a new application
+    :type body: ApplicationCreateSchema
+    :param application_service: The `application_service` parameter in the FastAPI endpoints is a
+    dependency that provides an instance of the `ApplicationService` class. This dependency is resolved
+    using the `get_application_service` function defined in the `app.dependency` module
+    :type application_service: Annotated[
+            ApplicationService, Depends(get_application_service)
+        ]
+    :param user: The `user` parameter in the FastAPI route functions represents the current
+    authenticated user making the request. It is obtained using the `current_user` dependency, which
+    likely handles authentication and authorization logic to identify the user based on the request
+    credentials or token
+    :type user: User
+    :return: The code provided defines several API endpoints for managing applications in a FastAPI
+    application. Here is a summary of what each endpoint returns:
+"""
 from typing import Annotated, List
+
 import logging
 
 from fastapi import APIRouter, Depends, Query

@@ -1,3 +1,5 @@
+# This code snippet defines a Python class `ImageService` that serves as a service layer for handling
+# image-related operations in a FastAPI application. Here's a breakdown of what the code is doing:
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -14,6 +16,7 @@ from app.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ImageService:
     image_repository: ImageRepository
@@ -21,10 +24,9 @@ class ImageService:
     logger: logger
 
     async def upload_image(
-            self,
-            image: Any,
-            user_id: UUID,
-
+        self,
+        image: Any,
+        user_id: UUID,
     ) -> Any:
         uploaded_image = await self.image_repository.upload_image(image, user_id)
 
@@ -33,23 +35,18 @@ class ImageService:
             "filename": uploaded_image.filename,
             "size": uploaded_image.size,
             "upload_date": uploaded_image.upload_date,
-            "user_id": str(user_id)
+            "user_id": str(user_id),
         }
         kafka_status = False
         try:
             await self.kafka_producer.produce(
                 topic=settings.KAFKA_TOPIC,
                 key=str(uploaded_image.id),
-                value=kafka_message
+                value=kafka_message,
             )
             kafka_status = True
         except KafkaImageDataUploadError as e:
-            self.logger(
-                "Fail while kafka producing error",
-                extra={
-                    "error": str(e)
-                }
-            )
+            self.logger("Fail while kafka producing error", extra={"error": str(e)})
 
         return ImageResponse(
             id=uploaded_image.id,
@@ -63,17 +60,14 @@ class ImageService:
         try:
             image = await self.image_repository.get_image_by_id(image_id)
             return image
-        except:
-            raise HTTPException(status_code=404, detail="Image not found or access denied")
+        except HTTPException as e:
+            raise e(status_code=404, detail="Image not found or access denied")
 
     async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
         try:
             await self.image_repository.delete_image_by_id(
-                image_id=image_id,
-                user_id=user_id
+                image_id=image_id, user_id=user_id
             )
-            return {
-                "msg": f"Image {image_id} deleted successfully"
-            }
-        except:
-            raise HTTPException(status_code=404, detail="Image not found or access denied")
+            return {"msg": f"Image {image_id} deleted successfully"}
+        except HTTPException as e:
+            raise e(status_code=404, detail="Image not found or access denied")

@@ -1,3 +1,5 @@
+# This Python code snippet is setting up API routes using FastAPI. Here's a breakdown of what each
+# part does:
 from fastapi import APIRouter
 
 from app.users.auth.config import fastapi_users, auth_backend

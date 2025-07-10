@@ -1,3 +1,5 @@
+# The `ImageRepository` class provides methods for uploading, retrieving, and deleting images while
+# handling database errors and logging relevant information.
 import os
 import logging
 from datetime import datetime
@@ -46,15 +48,15 @@ class ImageRepository:
                 extra={
                     "user_id": str(user_id),
                     "file_size": f"{image.size:.2f}MB",
-                    "file_path": file_path
-                }
+                    "file_path": file_path,
+                },
             )
             return image
         except SQLAlchemyError as e:
             self.logger.error(
                 f"Database error during image upload or image with name {image.filename} already exists",
                 extra={"user_id": str(user_id), "error": str(e)},
-                exc_info=True
+                exc_info=True,
             )
             await self.db_session.rollback()
             raise
@@ -66,10 +68,7 @@ class ImageRepository:
             )
             image = result.scalar_one_or_none()
             if not result:
-                self.logger.warning(
-                    "Image not found",
-                    extra={"image_id": image_id}
-                )
+                self.logger.warning("Image not found", extra={"image_id": image_id})
             return image
         except SQLAlchemyError as e:
             self.logger.error(
@@ -82,8 +81,7 @@ class ImageRepository:
         try:
             image = await self.db_session.execute(
                 select(ImageUploadModel).where(
-                    ImageUploadModel.id == image_id,
-                    ImageUploadModel.user_id == user_id
+                    ImageUploadModel.id == image_id, ImageUploadModel.user_id == user_id
                 )
             )
             image_model = image.scalar_one_or_none()
@@ -105,15 +103,12 @@ class ImageRepository:
             await self.db_session.delete(image_model)
             await self.db_session.commit()
 
-            self.logger.info(
-                "Image deleted successfully",
-                extra={"image_id": image_id}
-            )
+            self.logger.info("Image deleted successfully", extra={"image_id": image_id})
         except SQLAlchemyError as e:
             self.logger.error(
                 "Database error during image deletion",
                 extra={"image_id": image_id, "error": str(e)},
-                exc_info=True
+                exc_info=True,
             )
             await self.db_session.rollback()
             raise ImageNotFoundError(image_id)

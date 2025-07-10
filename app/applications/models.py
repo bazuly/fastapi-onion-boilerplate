@@ -1,3 +1,5 @@
+# This class defines an SQLAlchemy model for an application with columns for id, title, description,
+# creation timestamp, and user ID.
 from datetime import datetime as dt
 
 from sqlalchemy import Column, Integer, String, DateTime, UUID as SQLUUID

@@ -1,3 +1,5 @@
+# This class defines a base class for SQLAlchemy models with an id attribute and a dynamically
+# generated table name based on the class name.
 from typing import Any
 
 from sqlalchemy.orm import DeclarativeBase, declared_attr

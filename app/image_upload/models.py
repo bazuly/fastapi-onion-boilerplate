@@ -1,3 +1,5 @@
+# The `ImageUploadModel` class defines a SQLAlchemy model for storing information about uploaded
+# images, including filename, upload date, size, and user ID.
 from datetime import datetime
 
 from sqlalchemy import DateTime, String, Float, Column, UUID as SQLUUID
@@ -7,7 +9,7 @@ from app.infrastructure.database import Base
 
 
 class ImageUploadModel(Base):
-    __tablename__ = 'image_upload'
+    __tablename__ = "image_upload"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     filename: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)

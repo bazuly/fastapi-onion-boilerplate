@@ -1,3 +1,5 @@
+# The `KafkaProducer` class is an asynchronous Python class that handles producing messages to a Kafka
+# topic using aiokafka.
 import json
 
 from aiokafka import AIOKafkaProducer
