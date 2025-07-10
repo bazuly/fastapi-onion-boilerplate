@@ -1,8 +1,16 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+"""
+    The function defines settings for a Python application using Pydantic, including database, Kafka,
+    image upload, security, and cache configurations.
+    :return: The `get_settings()` function returns an instance of the `Settings` class with the
+    configured settings values.
+"""
 
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # all default settings hardcoded for reference,
 # do not do like this in production code
+
+
 class Settings(BaseSettings):
     # =========================================================
     DB_DRIVER: str = "postgresql+asyncpg"
@@ -23,7 +31,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     # =========================================================
     CACHE_HOST: str = "redis"
-    CACHE_PORT: int = "6379"
+    CACHE_PORT: int = 6379
     CACHE_DB: int = 0
 
     model_config = SettingsConfigDict(

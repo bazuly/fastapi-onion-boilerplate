@@ -1,10 +1,20 @@
+"""
+    The above code contains fixtures and configurations for testing a FastAPI application with
+    SQLAlchemy and Kafka mocking.
+"""
+
+
 import os
+
 import tempfile
 from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
@@ -16,6 +26,14 @@ from tests.utils.utils import random_lower_string
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
 )
+
+
+@pytest.fixture(autouse=True)
+def init_cache():
+    """Initialize FastAPICache with in-memory backend for tests"""
+    FastAPICache.init(InMemoryBackend(), prefix="test-cache")
+    yield
+    FastAPICache.reset()
 
 
 @pytest.fixture(autouse=True)

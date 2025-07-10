@@ -1,3 +1,5 @@
+# This code snippet is setting up user authentication and authorization using FastAPI and FastAPI
+# Users library. Here's a breakdown of what each part is doing:
 import uuid
 
 from fastapi_users import FastAPIUsers

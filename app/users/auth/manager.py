@@ -1,3 +1,7 @@
+# This class `UserManager` defines methods for handling user registration, password reset, and
+# verification token requests in a FastAPI application.
+# code took from fastapi_users documentation:
+# https://fastapi-users.github.io/fastapi-users/latest/configuration/user-manager/?h=usermanager
 import uuid
 from typing import Optional
 

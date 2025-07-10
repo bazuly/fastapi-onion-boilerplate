@@ -1,3 +1,5 @@
+# The above class defines user schemas for reading, creating, and updating users in a FastAPI
+# application.
 import uuid
 
 from fastapi_users import schemas

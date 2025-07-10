@@ -15,7 +15,8 @@ async def test_create_application__success(db_session: AsyncSession):
     description = raw_data.description
     user_id = raw_data.user_id
 
-    application_data = ApplicationCreateSchema(title=title, description=description)
+    application_data = ApplicationCreateSchema(
+        title=title, description=description)
     created_app = await repository.create_application(application_data, user_id)
 
     assert created_app.id is not None

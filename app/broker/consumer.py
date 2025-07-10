@@ -1,3 +1,5 @@
+# This class defines a Kafka consumer in Python using aiokafka library for consuming messages from a
+# Kafka topic.
 import asyncio
 import json
 

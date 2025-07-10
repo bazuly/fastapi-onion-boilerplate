@@ -1,3 +1,5 @@
+# The above classes define Pydantic schemas for an application with attributes such as id, title,
+# description, created_at, and kafka_status.
 from datetime import datetime as dt
 
 from pydantic import BaseModel

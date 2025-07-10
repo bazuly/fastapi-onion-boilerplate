@@ -1,4 +1,15 @@
+"""
+    The provided code snippet sets up connections to Redis and Kafka with retry logic and initializes
+    FastAPI with routers for different application components.
+    
+    :param app: The `app` parameter in the code snippet refers to an instance of the FastAPI class. It
+    is used to create a FastAPI application that will serve as the main application for the project. The
+    `lifespan` function is a context manager that handles the initialization and cleanup tasks for
+    connecting to
+    :type app: FastAPI
+"""
 import asyncio
+
 import logging
 from contextlib import asynccontextmanager
 
@@ -38,7 +49,8 @@ async def lifespan(app: FastAPI):
                 prefix="fastapi-cache:",
                 expire=60,
             )
-            logger.info("Successfully connected to Redis and initialized cache")
+            logger.info(
+                "Successfully connected to Redis and initialized cache")
             break
         except RedisError as e:
             logger.error(
@@ -56,7 +68,8 @@ async def lifespan(app: FastAPI):
             await consumer.start()
             break
         except KafkaConnectionError as e:
-            print(f"Connection attempt {attempt + 1}/{retries} failed: {str(e)}")
+            print(
+                f"Connection attempt {attempt + 1}/{retries} failed: {str(e)}")
             if attempt == retries - 1:
                 raise RuntimeError(
                     "Failed to connect to Kafka after multiple attempts"
@@ -69,7 +82,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    lifespan=lifespan, swagger_ui_parameters={"syntaxHighlight.theme": "monokai"}
+    lifespan=lifespan
 )
 
 app.include_router(applications_router)

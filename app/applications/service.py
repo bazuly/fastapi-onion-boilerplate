@@ -1,3 +1,5 @@
+# This code snippet defines a Python class `ApplicationService` that serves as a service layer for
+# handling application-related operations. Here's a breakdown of what the code is doing:
 import datetime
 import logging
 from dataclasses import dataclass
@@ -19,15 +21,8 @@ from app.settings import settings
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class ApplicationService:
-    """
-    Service for applications.
-    Attributes:
-        application_repository: Repository for work with DB
-        kafka_producer: Producer for sending messages in Kafka
-    """
 
     application_repository: ApplicationRepository
     kafka_producer: KafkaProducer

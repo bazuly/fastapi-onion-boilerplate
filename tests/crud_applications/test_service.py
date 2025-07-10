@@ -34,7 +34,8 @@ async def test_create_application__failure():
     mock_repo = AsyncMock()
     mock_kafka = AsyncMock()
 
-    mock_kafka.produce.side_effect = KafkaMessageError(details=kafka_error_detail)
+    mock_kafka.produce.side_effect = KafkaMessageError(
+        details=kafka_error_detail)
     data = await ApplicationFactory.create()
 
     mock_repo.create_application.return_value = data
