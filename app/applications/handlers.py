@@ -27,14 +27,9 @@ import logging
 from fastapi import APIRouter, Depends, Query
 
 from app.app_config import current_user
-from app.applications.schemas import (
-    ApplicationCreateSchema,
-    ApplicationSchema,
-    ApplicationResponseSchema,
-)
-from app.applications.service import ApplicationService
+from app.applications import ApplicationCreateSchema, ApplicationSchema, ApplicationResponseSchema, ApplicationService
 from app.dependency import get_application_service
-from app.users.auth.models import User
+from app.users.auth import User
 from app.settings import DescriptionSettings
 
 router = APIRouter(prefix="/applications", tags=["applications"])

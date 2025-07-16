@@ -33,9 +33,13 @@ class Settings(BaseSettings):
     CACHE_HOST: str = "redis"
     CACHE_PORT: int = 6379
     CACHE_DB: int = 0
+    REDIS_URL: str = "redis://cache:6379/0"
+    # =========================================================
+    MONGODB_URL: str = "mongodb://mongodb:27017/"
+    MONGODB_NAME: str = "mongo_db"
 
     model_config = SettingsConfigDict(
-        env_file="../.env", extra="ignore", case_sensitive=False
+        env_file="../.env", extra="ignore", case_sensitive=False,
     )
 
     @property
@@ -53,3 +57,9 @@ def get_settings():
 
 
 settings = get_settings()
+
+# TODO сделать идеальный шаблон чистой архитектуры. Kafka + mongo + uv + fastapi_users + sqlalchemy + fastapi_cache + make files + factory для тестирования
+# TODO ну и соответственно хороший реадми и полные тесты, без ворнингов ебучих, а ну и переименовать репозиторий
+# TODO в самом гитхаб (onion architecture), а то хуета полная
+# TODO все эти тупые скрипы сделать через make
+# TODO сделать нормальные импорты через init

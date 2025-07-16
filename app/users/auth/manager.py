@@ -8,7 +8,7 @@ from typing import Optional
 from fastapi import Request
 from fastapi_users import BaseUserManager, UUIDIDMixin
 
-from app.users.auth.models import User
+from app.users.auth import User
 from app.settings import settings
 
 

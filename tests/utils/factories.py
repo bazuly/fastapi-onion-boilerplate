@@ -12,8 +12,8 @@ from factory.declarations import (
     Sequence,
 )
 
-from app.applications.models import ApplicationModel
-from app.image_upload.models import ImageUploadModel
+from app.image_upload import ImageUploadModel
+from app.applications import ApplicationModel
 
 
 class AsyncSQLAlchemyModelFactory(SQLAlchemyModelFactory):

@@ -2,7 +2,7 @@
     The function `get_db_session` asynchronously creates and manages a database session with error
     handling using SQLAlchemy in a Python application.
 """
-from typing import Generator
+from typing import AsyncGenerator
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
@@ -19,7 +19,7 @@ engine = create_async_engine(
 AsyncSessionFactory = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def get_db_session() -> Generator[AsyncSession]:
+async def get_db_session() -> AsyncGenerator[AsyncSession]:
     async with AsyncSessionFactory() as session:
         try:
             yield session

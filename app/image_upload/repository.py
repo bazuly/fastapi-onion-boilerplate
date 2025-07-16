@@ -11,8 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions import RepositoryError, ImageNotFoundError
-from app.image_upload.models import ImageUploadModel
+from app.image_upload import ImageUploadModel
 
 logger = logging.getLogger(__name__)
 
@@ -68,14 +67,15 @@ class ImageRepository:
             )
             image = result.scalar_one_or_none()
             if not result:
-                self.logger.warning("Image not found", extra={"image_id": image_id})
+                self.logger.warning("Image not found", extra={
+                                    "image_id": image_id})
             return image
         except SQLAlchemyError as e:
             self.logger.error(
                 "Database error fetching image",
                 extra={"image_id": image_id, "error": str(e)},
             )
-            raise ImageNotFoundError(image_id)
+            raise
 
     async def delete_image_by_id(self, image_id: int | UUID, user_id: UUID) -> None:
         try:
@@ -103,7 +103,8 @@ class ImageRepository:
             await self.db_session.delete(image_model)
             await self.db_session.commit()
 
-            self.logger.info("Image deleted successfully", extra={"image_id": image_id})
+            self.logger.info("Image deleted successfully",
+                             extra={"image_id": image_id})
         except SQLAlchemyError as e:
             self.logger.error(
                 "Database error during image deletion",
@@ -111,11 +112,11 @@ class ImageRepository:
                 exc_info=True,
             )
             await self.db_session.rollback()
-            raise ImageNotFoundError(image_id)
+            raise
 
         except RepositoryError as e:
             self.logger.error(
                 "Delete attempt for non-existent image",
                 extra={"image_id": image_id, "error": str(e)},
             )
-            raise ImageNotFoundError(image_id)
+            raise

@@ -29,7 +29,7 @@ from app.dependency import get_image_upload_service
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.schemas import ImageCreateBase
 from app.image_upload.service import ImageService
-from app.users.auth.models import User
+from app.users.auth import User
 
 router = APIRouter(prefix="/image_upload", tags=["image_upload"])
 

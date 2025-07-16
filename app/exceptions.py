@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from fastapi import HTTPException, status
+
 
 class BaseAppError(Exception):
     """Base exception for all application errors."""
@@ -85,3 +87,35 @@ class KafkaMessageError(KafkaError):
 
 class KafkaImageDataUploadError(KafkaError):
     default_message = "Failed to send image data"
+
+
+class CrudException(HTTPException):
+    def __init__(
+            self,
+            detail: str = "CRUD operation error",
+            status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
+    ):
+        super().__init__(status_code=status_code, detail=detail)
+
+
+class UserLogException(HTTPException):
+    def __init__(self, operation: str):
+        detail = f"Audit failed for operation: {operation}"
+        super().__init__(detail=detail, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class MongoException(Exception):
+    """Base exception for Mongo errors."""
+
+    default_message = "Mongo error occurred."
+
+    def __init__(self, details: str):
+        self.details = details
+        message = self.default_message
+        if details:
+            message += f" Details: {details}"
+        super().__init__(message)
+
+
+class RecordMongoException(MongoException):
+    default_message = "Failed to record data into mongo DB"

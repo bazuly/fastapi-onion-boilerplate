@@ -35,8 +35,6 @@ class KafkaConsumer:
                 print(f"Topic: {msg.topic}")
                 print(f"Key: {msg.key.decode()}")
                 print(f"Value: {msg.value}")
-                print(f"Partition: {msg.partition}")
-                print(f"Offset: {msg.offset}")
                 print("=" * 50 + "\n")
         except ConsumerError as e:
             print(f"Consumer error: {str(e)}")

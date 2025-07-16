@@ -1,9 +1,12 @@
 import pytest
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.applications.repository.application_repository import ApplicationRepository
-from app.applications.schemas import ApplicationCreateSchema
+from app.applications import ApplicationCreateSchema
+from app.applications.repository import ApplicationRepository
 from tests.utils.factories import ApplicationFactory
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.asyncio
