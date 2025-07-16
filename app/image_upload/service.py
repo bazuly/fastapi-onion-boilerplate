@@ -10,7 +10,7 @@ from fastapi import HTTPException
 from app.broker.producer import KafkaProducer
 from app.exceptions import KafkaImageDataUploadError
 from app.image_upload.models import ImageUploadModel
-from app.image_upload.repository.image_repository import ImageRepository
+from app.image_upload.repository import ImageRepository
 from app.image_upload.schemas import ImageResponse
 from app.settings import settings
 
@@ -46,7 +46,8 @@ class ImageService:
             )
             kafka_status = True
         except KafkaImageDataUploadError as e:
-            self.logger("Fail while kafka producing error", extra={"error": str(e)})
+            self.logger("Fail while kafka producing error",
+                        extra={"error": str(e)})
 
         return ImageResponse(
             id=uploaded_image.id,
@@ -61,6 +62,7 @@ class ImageService:
             image = await self.image_repository.get_image_by_id(image_id)
             return image
         except HTTPException as e:
+            # TODO hueta
             raise e(status_code=404, detail="Image not found or access denied")
 
     async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:

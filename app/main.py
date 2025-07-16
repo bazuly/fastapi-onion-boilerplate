@@ -26,10 +26,16 @@ from redis import asyncio as redis
 from app.applications.handlers import router as applications_router
 from app.broker.consumer import KafkaConsumer
 from app.image_upload.handlers import router as image_upload_router
+from app.infrastructure.database.mongo_db.accessor import (
+    startup_db_client as startup_mongo_db_client,
+    shutdown_db_client as shutdown_mongo_db_client,
+)
 from app.users.auth.handlers import router as users_router
+from app.settings import get_settings
 
 logger = logging.getLogger(__name__)
 consumer = KafkaConsumer()
+settings = get_settings()
 
 
 @asynccontextmanager
@@ -41,7 +47,7 @@ async def lifespan(app: FastAPI):
     for attempt in range(retries):
         try:
             logger.info("Attempting to connect to Redis...")
-            pool = ConnectionPool.from_url(url="redis://cache:6379/0")
+            pool = ConnectionPool.from_url(url=settings.REDIS_URL)
             r = redis.Redis(connection_pool=pool)
             await r.ping()
             FastAPICache.init(
@@ -75,10 +81,22 @@ async def lifespan(app: FastAPI):
                     "Failed to connect to Kafka after multiple attempts"
                 ) from e
             await asyncio.sleep(delay)
+            await consumer.stop()
+
+    # mongo connection lifespan
+    for attempt in range(retries):
+        try:
+            await startup_mongo_db_client(app)
+        except Exception as e:
+            logger.error(f"Failed to connect to MongoDB: {e}")
+            if attempt == retries - 1:
+                raise RuntimeError(
+                    "Failed to connect to MongoDB after multiple attempts"
+                ) from e
+            await asyncio.sleep(delay)
+            await shutdown_mongo_db_client(app)
 
     yield
-
-    await consumer.stop()
 
 
 app = FastAPI(

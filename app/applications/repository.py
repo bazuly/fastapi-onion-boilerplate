@@ -10,8 +10,7 @@ from fastapi_cache.decorator import cache
 from sqlalchemy import insert, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.applications.models import ApplicationModel
-from app.applications.schemas import ApplicationCreateSchema
+from app.applications import ApplicationModel, ApplicationCreateSchema
 
 logger = logging.getLogger(__name__)
 

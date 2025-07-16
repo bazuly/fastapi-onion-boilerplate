@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.settings import Settings
 
-from app.users.auth.models import *  # noqa
-from app.applications.models import *  # noqa
-from app.image_upload.models import *  # noqa
+from app.applications import *  # noqa
+from app.image_upload import *  # noqa
+from app.users.auth import *  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

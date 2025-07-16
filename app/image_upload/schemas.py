@@ -10,7 +10,8 @@ class ImageCreateBase(BaseModel):
     size: float
 
 
-class ImageCreate(ImageCreateBase): ...
+class ImageCreate(ImageCreateBase):
+    ...
 
 
 class ImageResponse(ImageCreateBase):

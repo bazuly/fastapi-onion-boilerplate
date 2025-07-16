@@ -6,8 +6,8 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import ImageNotFoundError
-from app.image_upload.models import ImageUploadModel
-from app.image_upload.repository.image_repository import ImageRepository
+from app.image_upload import ImageUploadModel
+from app.image_upload.repository import ImageRepository
 from tests.utils.factories import ImageFactory
 
 
