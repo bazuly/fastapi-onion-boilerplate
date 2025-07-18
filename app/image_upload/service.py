@@ -9,6 +9,7 @@ from fastapi import HTTPException
 
 from app.broker.producer import KafkaProducer
 from app.exceptions import KafkaImageDataUploadError
+from app.mongo import UserLogService
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository import ImageRepository
 from app.image_upload.schemas import ImageResponse
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 class ImageService:
     image_repository: ImageRepository
     kafka_producer: KafkaProducer
+    user_log_service: UserLogService
     logger: logger
 
     async def upload_image(
@@ -29,6 +31,12 @@ class ImageService:
         user_id: UUID,
     ) -> Any:
         uploaded_image = await self.image_repository.upload_image(image, user_id)
+
+        try:
+            await self.user_log_service.log_endpoint_call(endpoint="upload_image", user_id=user_id)
+        except RecordMongoException as e:
+            self.logger.error(
+                "Error during data record, MongoDB: {}".format(e))
 
         kafka_message = {
             "id": uploaded_image.id,
@@ -62,8 +70,13 @@ class ImageService:
             image = await self.image_repository.get_image_by_id(image_id)
             return image
         except HTTPException as e:
-            # TODO hueta
             raise e(status_code=404, detail="Image not found or access denied")
+
+        try:
+            await self.user_log_service.log_endpoint_call(endpoint="get_image", user_id=user_id)
+        except RecordMongoException as e:
+            self.logger.error(
+                "Error during data record, MongoDB: {}".format(e))
 
     async def delete_image_by_id(self, image_id: int, user_id: UUID) -> dict:
         try:
@@ -73,3 +86,9 @@ class ImageService:
             return {"msg": f"Image {image_id} deleted successfully"}
         except HTTPException as e:
             raise e(status_code=404, detail="Image not found or access denied")
+
+        try:
+            await self.user_log_service.log_endpoint_call(endpoint="delete_image", user_id=user_id)
+        except RecordMongoException as e:
+            self.logger.error(
+                "Error during data record, MongoDB: {}".format(e))
