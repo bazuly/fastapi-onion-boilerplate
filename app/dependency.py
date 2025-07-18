@@ -27,8 +27,6 @@ logger = logging.getLogger(__name__)
 
 
 async def get_audit_service(request: Request) -> UserLogService:
-    # with request, we can get mongo collection by collection name
-    # collection = request.app.mongodb["user_logs"]
     client = AsyncIOMotorClient(
         settings.MONGODB_URL, uuidRepresentation='standard')
     collection = client.get_database('user_logs').get_collection('user_logs')
