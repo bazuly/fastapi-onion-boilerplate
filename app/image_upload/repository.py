@@ -12,6 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.image_upload import ImageUploadModel
+from app.exceptions import RepositoryError
 
 logger = logging.getLogger(__name__)
 
