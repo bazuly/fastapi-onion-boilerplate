@@ -8,7 +8,7 @@ from uuid import UUID
 from fastapi import HTTPException
 
 from app.broker.producer import KafkaProducer
-from app.exceptions import KafkaImageDataUploadError
+from app.exceptions import KafkaImageDataUploadError, RecordMongoException
 from app.mongo import UserLogService
 from app.image_upload.models import ImageUploadModel
 from app.image_upload.repository import ImageRepository
@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 class ImageService:
     image_repository: ImageRepository
     kafka_producer: KafkaProducer
-    user_log_service: UserLogService
     logger: logger
+    user_log_service: UserLogService
 
     async def upload_image(
         self,
@@ -54,8 +54,14 @@ class ImageService:
             )
             kafka_status = True
         except KafkaImageDataUploadError as e:
-            self.logger("Fail while kafka producing error",
+            self.logger.error("Fail while kafka producing error",
                         extra={"error": str(e)})
+
+        try:
+            await self.user_log_service.log_endpoint_call(endpoint="upload_image", user_id=user_id)
+        except RecordMongoException as e:
+            self.logger.error(
+                "Error during data record, MongoDB: {}".format(e))
 
         return ImageResponse(
             id=uploaded_image.id,
@@ -73,7 +79,7 @@ class ImageService:
             raise e(status_code=404, detail="Image not found or access denied")
 
         try:
-            await self.user_log_service.log_endpoint_call(endpoint="get_image", user_id=user_id)
+            await self.user_log_service.log_endpoint_call(endpoint="get_image", user_id=None)
         except RecordMongoException as e:
             self.logger.error(
                 "Error during data record, MongoDB: {}".format(e))
@@ -86,7 +92,6 @@ class ImageService:
             return {"msg": f"Image {image_id} deleted successfully"}
         except HTTPException as e:
             raise e(status_code=404, detail="Image not found or access denied")
-
         try:
             await self.user_log_service.log_endpoint_call(endpoint="delete_image", user_id=user_id)
         except RecordMongoException as e:
