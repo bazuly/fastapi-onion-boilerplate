@@ -36,14 +36,6 @@ def init_cache():
     FastAPICache.reset()
 
 
-@pytest.fixture(autouse=True)
-def mock_kafka():
-    from app.broker import consumer
-
-    consumer.KafkaConsumer = AsyncMock()
-    yield
-
-
 @pytest_asyncio.fixture
 async def db_session():
     engine = create_async_engine(TEST_DATABASE_URL)

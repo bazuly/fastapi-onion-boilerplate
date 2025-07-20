@@ -21,7 +21,7 @@ class TestImageRepository:
         self.user_id = uuid.uuid4()
 
     async def test_upload_image__success(
-        self, mock_file, db_session, tmp_upload_dir
+        self, mock_file
     ) -> None:
         result = await self.repo.upload_image(mock_file, self.user_id)
 
@@ -29,7 +29,7 @@ class TestImageRepository:
         assert os.path.exists(os.path.join(
             self.repo.upload_dir, mock_file.filename))
 
-    async def test_get_image__success(self, mock_file, db_session) -> None:
+    async def test_get_image__success(self, mock_file) -> None:
         image = await self.repo.upload_image(mock_file, self.user_id)
 
         result = await self.repo.get_image_by_id(image.id)
@@ -43,7 +43,7 @@ class TestImageRepository:
             raise ImageNotFoundError(999)
 
     async def test_delete_image__success(
-        self, mock_file, db_session, tmp_upload_dir
+        self, mock_file
     ) -> None:
         image = await self.repo.upload_image(mock_file, self.user_id)
         file_path = os.path.join(self.repo.upload_dir, image.filename)

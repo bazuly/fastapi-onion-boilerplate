@@ -14,7 +14,7 @@ async def startup_db_client(app):
         app.mongodb = app.mongodb_client["user_logs"]
 
         logger.info("MongoDB connected successfully")
-        print("MongoDB connected successfully")  # TODO remove later
+        print("MongoDB connected successfully")
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB: {e}")
         raise
@@ -26,6 +26,3 @@ async def shutdown_db_client(app):
         logger.info("Database disconnected successfully")
     except Exception as e:
         logger.error(f"Error closing database connection: {e}")
-
-
-# TODO Настроить структурированное логирование
