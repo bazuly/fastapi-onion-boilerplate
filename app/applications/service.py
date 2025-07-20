@@ -17,18 +17,21 @@ from app.applications import (
 from app.applications.repository import ApplicationRepository
 from app.mongo import UserLogService
 from app.broker.producer import KafkaProducer
-from app.exceptions import KafkaMessageError, RecordMongoException
+from app.exceptions import (
+    KafkaMessageError,
+    RecordMongoException,
+    ApplicationNotFound
+)
 from app.settings import settings
 
 logger = logging.getLogger(__name__)
 
-# TODO сделать так, чтобы если пользователь не авторизован,
-# TODO user_id в логах был "no_auth", а если авторизован, то был залоггирован его айди
+
 @dataclass
 class ApplicationService:
     application_repository: ApplicationRepository
     kafka_producer: KafkaProducer
-    logger: logger
+    logger: logger  # type: ignore
     user_log_service: UserLogService
 
     async def create_application(
@@ -75,17 +78,18 @@ class ApplicationService:
         )
 
     async def get_application_by_id(self, application_id: int) -> ApplicationSchema:
-        application = await self.application_repository.get_application_by_id(
-            application_id
-        )
-        if not application:
+        try:
+            application = await self.application_repository.get_application_by_id(
+                application_id
+            )
+            await self.user_log_service.log_endpoint_call(endpoint="get_application_by_id", user_id=None)
+        except ApplicationNotFound as e:
             self.logger.error(
                 "Application with application id: %s not found", application_id
             )
             raise HTTPException(
                 status_code=404, detail="Application not found")
-        try:
-            await self.user_log_service.log_endpoint_call(endpoint="get_application_by_id", user_id=None)
+
         except RecordMongoException as e:
             self.logger.error(
                 "Error during data record, MongoDB: {}".format(e))
@@ -93,16 +97,16 @@ class ApplicationService:
         return ApplicationSchema.model_validate(application)
 
     async def get_application_by_title(self, title: str) -> List[ApplicationSchema]:
-        applications = await self.application_repository.get_application_by_title(
-            title=title,
-        )
-        if not applications:
+        try:
+            applications = await self.application_repository.get_application_by_title(
+                title=title,
+            )
+            await self.user_log_service.log_endpoint_call(endpoint="get_application_by_title", user_id=None)
+        except ApplicationNotFound as e:
             self.logger.warning("Application with title: %s not found", title)
             raise HTTPException(
                 status_code=404, detail=f"No applications found titled {title}"
             )
-        try:
-            await self.user_log_service.log_endpoint_call(endpoint="get_application_by_title", user_id=None)
         except RecordMongoException as e:
             self.logger.error(
                 "Error during data record, MongoDB: {}".format(e))
@@ -129,21 +133,19 @@ class ApplicationService:
 
     async def delete_user_application(self, application_id: int, user_id: UUID):
         try:
-            return await self.application_repository.delete_user_application(
+            await self.application_repository.delete_user_application(
                 application_id=application_id, user_id=user_id
             )
+            await self.user_log_service.log_endpoint_call(endpoint="delete_user_application", user_id=user_id)
+            return {"msg": f"Application {application_id} deleted successfully"}
         except HTTPException as e:
             self.logger.error(
                 "Error while deleting user application:", extra={"error_detail": str(e)}
             )
 
-        try:
-            await self.user_log_service.log_endpoint_call(endpoint="delete_user_application", user_id=user_id)
         except RecordMongoException as e:
             self.logger.error(
                 "Error during data record, MongoDB: {}".format(e))
-
-        return None
 
     async def edit_application(
             self,
@@ -152,20 +154,23 @@ class ApplicationService:
             new_title: str | None = None,
             new_description: str | None = None,
     ) -> ApplicationSchema:
-        updated_application = await self.application_repository.edit_application_info(
-            application_id=application_id,
-            user_id=user_id,
-            new_title=new_title,
-            new_description=new_description,
-        )
-        if not updated_application:
-            raise HTTPException(
-                status_code=404, detail=f"No application found for user: {user_id}"
-            )
         try:
+            updated_application = await self.application_repository.edit_application_info(
+                application_id=application_id,
+                user_id=user_id,
+                new_title=new_title,
+                new_description=new_description,
+            )
             await self.user_log_service.log_endpoint_call(endpoint="edit_application", user_id=user_id)
+            return ApplicationSchema.model_validate(updated_application)
+
+        except ApplicationNotFound as e:
+            self.logger.error(
+                "Application with application id: %s not found", application_id
+            )
+            raise HTTPException(
+                status_code=404, detail="Application not found")
+
         except RecordMongoException as e:
             self.logger.error(
                 "Error during data record, MongoDB: {}".format(e))
-
-        return ApplicationSchema.model_validate(updated_application)
