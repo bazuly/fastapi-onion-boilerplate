@@ -1,4 +1,4 @@
-# Fastapi onion acrhitecure boilerplate
+# Fastapi onion architecture boilerplate
 
 > **This repository is an architectural example of a modern FastAPI application.**
 > 
