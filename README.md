@@ -1,4 +1,4 @@
-# FastAPI Kafka Example
+# Fastapi onion acrhitecure boilerplate
 
 > **This repository is an architectural example of a modern FastAPI application.**
 > 
