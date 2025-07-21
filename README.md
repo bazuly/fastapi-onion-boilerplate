@@ -1,314 +1,115 @@
-# FastAPI Application Service
+# FastAPI Kafka Example
 
-An example microservice built on FastAPI using PostgresSQL, Docker and Kafka.
+> **This repository is an architectural example of a modern FastAPI application.**
+> 
+> The main goal is to demonstrate a clean, maintainable backend structure (Onion Architecture) and integration with popular technologies. **All technologies are optional** — use only what fits your needs!
 
-Goals:
-- Complete tests
+---
 
+## 🛠️ Technologies Used
 
-## 🚀 Quick start
+- **FastAPI** — Modern, async Python web framework
+- **SQLAlchemy** — Async ORM for PostgreSQL
+- **Kafka** — Event streaming platform (via aiokafka)
+- **MongoDB** — NoSQL database for logging and caching
+- **Redis** — Caching layer (via fastapi-cache2)
+- **fastapi-users** — User authentication and management
+- **uv** — Fast dependency management and runner
+- **Makefile** — Unified commands for development, testing, and deployment
+- **factory_boy** — Factories for robust and isolated testing
 
-### Requirements
+---
 
-- Docker
-- Docker Compose
-- Kafka
-- Make utils (Does not support Windows)
-- Python 3.11+
+## 🧅 Onion Architecture
 
-### Installation and launch
+The project follows the principles of Onion (Clean) Architecture:
+- **Domain Layer** — Business logic and models
+- **Service Layer** — Application use cases
+- **Infrastructure Layer** — Database, external services, Kafka, Redis, MongoDB
+- **API Layer** — FastAPI routers and endpoints
 
-1. Clone repository:
-   ```bash
-   git clone https://github.com/yourusername/fastAPI-kafka-example.git
-   cd fastAPI-kafka-example
+This separation ensures testability, scalability, and maintainability.
+
+---
+
+## 🚀 Quick Start (with Makefile)
+
+1. **Clone the repository:**
+   ```sh
+   git clone <repo_url>
+   cd fastapi-kafka-example
+   ```
+2. **Copy and edit environment variables:**
+   ```sh
    cp .env.example .env
-   docker-compose up -d --build
-   docker-compose exec web alembic upgrade head
-   docker-compose exec web alembic revision --autogenerate -m "migration_name"
-    
-2. Web service will be : http://localhost:8000/docs/
+   # Edit .env as needed
+   ```
+3. **Run the application (all services):**
+   ```sh
+   make build         # Build and start all containers
+   # or
+   make build-background  # Start in background
+   ```
+4. **Stop all containers:**
+   ```sh
+   make down
+   ```
+5. **Run tests:**
+   ```sh
+   make test
+   ```
+6. **Database migrations:**
+   ```sh
+   make migrate-create MIGRATION="message"  # Create new migration
+   make migrate-apply                        # Apply migrations
+   ```
 
-3. Test boilerplate app:
-   ```bash
-   docker compose - docker-compose-test.yaml up --build
+---
 
-🛠 Techs
+## 📚 Main Endpoints
 
-    FastAPI - web framework
+### Applications
+- `POST   /applications` — Create new application
+- `GET    /applications` — List applications (pagination)
+- `GET    /applications/by-title/{title}` — Find by title
+- `GET    /applications/{application_id}` — Get by ID
+- `PATCH  /applications/{application_id}` — Update application
+- `DELETE /applications/{application_id}` — Delete application
 
-    PostgreSQL - main database 
+### Image Upload
+- `POST   /image_upload/image_upload` — Upload image
+- `GET    /image_upload/image_get/{image_id}` — Get image info
+- `DELETE /image_upload/image_delete/{image_id}` — Delete image
 
-    Alembic - magration service
+### Authentication & Users (fastapi-users)
+- `POST   /auth/register` — Register new user
+- `POST   /auth/jwt/login` — Login (JWT)
+- `GET    /users/me` — Get current user info
+- `PATCH  /users/{id}` — Update user
 
-    Kafka - event processing
+---
 
-    Docker - containerization
+## 📦 Project Structure (Onion Example)
 
-    AsyncPG - async driver for PostgreSQL
-
-
-🐳 Docker Compose
-
-Service:
-
-    web - FastAPI app (port 8000)
-    db - PostgreSQL (port 5432)
-    kafka - Kafka broker (port 9092)
-    zookeeper - Zookeeper for Kafka (port 2181)
-
-
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-#### Register User
-```bash
-POST /auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "securepassword123"
-}
+```
+app/
+  applications/      # Business logic (domain, service, repository, schemas)
+  image_upload/      # Image upload logic
+  users/             # User management & auth
+  broker/            # Kafka consumer/producer
+  infrastructure/    # DB, MongoDB, Redis access
+  main.py            # FastAPI app, routers
 ```
 
-**Response:**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "email": "user@example.com",
-  "is_active": true,
-  "is_superuser": false,
-  "is_verified": false
-}
-```
+---
 
-#### Login
-```bash
-POST /auth/jwt/login
-Content-Type: application/x-www-form-urlencoded
+## 📝 Notes
+- This is a **learning/architecture example** — not production ready out of the box.
+- All integrations (Kafka, MongoDB, Redis, etc.) are optional and can be swapped or removed.
+- The codebase is designed for easy testing and extension.
 
-username=user@example.com&password=securepassword123
-```
+---
 
-**Response:**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer"
-}
-```
+## 🤝 Contributing
+Pull requests and suggestions are welcome! If you spot a bug or want to improve the architecture, feel free to open an issue or PR.
 
-#### Get Current User
-```bash
-GET /users/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "email": "user@example.com",
-  "is_active": true,
-  "is_superuser": false,
-  "is_verified": false
-}
-```
-
-### Applications API
-
-#### Create Application
-```bash
-POST /applications/applications
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-
-{
-  "title": "My Application",
-  "description": "This is a sample application"
-}
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "title": "My Application",
-  "description": "This is a sample application",
-  "created_at": "2024-01-15T10:30:00Z",
-  "kafka_status": true
-}
-```
-
-#### Get All Applications (with pagination)
-```bash
-GET /applications/applications?page=1&size=10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "title": "My Application",
-    "description": "This is a sample application",
-    "created_at": "2024-01-15T10:30:00Z"
-  },
-  {
-    "id": 2,
-    "title": "Another App",
-    "description": "Another sample application",
-    "created_at": "2024-01-15T11:00:00Z"
-  }
-]
-```
-
-#### Get Application by ID
-```bash
-GET /applications/applications/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "title": "My Application",
-  "description": "This is a sample application",
-  "created_at": "2024-01-15T10:30:00Z"
-}
-```
-
-#### Search Applications by Title
-```bash
-GET /applications/applications/by-title/My%20Application
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "title": "My Application",
-    "description": "This is a sample application",
-    "created_at": "2024-01-15T10:30:00Z"
-  }
-]
-```
-
-#### Update Application
-```bash
-PATCH /applications/applications/1?new_title=Updated%20Title&new_description=Updated%20description
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "title": "Updated Title",
-  "description": "Updated description",
-  "created_at": "2024-01-15T10:30:00Z"
-}
-```
-
-#### Delete Application
-```bash
-DELETE /applications/applications/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:** `200 OK` (empty body)
-
-### Image Upload API
-
-#### Upload Image
-```bash
-POST /image_upload/image_upload
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: multipart/form-data
-
-image=@/path/to/your/image.jpg
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "filename": "image.jpg",
-  "size": 1024.5,
-  "upload_date": "2024-01-15T10:30:00Z",
-  "kafka_status": true
-}
-```
-
-#### Get Image by ID
-```bash
-GET /image_upload/image_get/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:**
-```json
-{
-  "filename": "image.jpg",
-  "size": 1024.5
-}
-```
-
-#### Delete Image
-```bash
-DELETE /image_upload/image_delete/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Response:** `200 OK` (empty body)
-
-## 🔧 Error Responses
-
-### Common Error Formats
-
-#### 401 Unauthorized
-```json
-{
-  "detail": "Unauthorized"
-}
-```
-
-#### 403 Forbidden
-```json
-{
-  "detail": "Forbidden"
-}
-```
-
-#### 404 Not Found
-```json
-{
-  "detail": "Not found"
-}
-```
-
-#### 422 Validation Error
-```json
-{
-  "detail": [
-    {
-      "loc": ["body", "email"],
-      "msg": "field required",
-      "type": "value_error.missing"
-    }
-  ]
-}
-```
-
-Additional docs:
-
-- https://docs.python.org/3/howto/logging.html Python logger
-- https://docs.pydantic.dev/latest/ Pydantic
-- https://fastapi-users.github.io/fastapi-users/latest/ FastAPI users
-- https://docs.python.org/3/library/asyncio.html asyncio python

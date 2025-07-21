@@ -57,7 +57,3 @@ def get_settings():
 
 
 settings = get_settings()
-
-# TODO сделать идеальный шаблон чистой архитектуры. Kafka + mongo + uv + fastapi_users + sqlalchemy + fastapi_cache + make files + factory для тестирования
-# TODO ну и соответственно хороший реадми и полные тесты, без ворнингов ебучих, а ну и переименовать репозиторий
-# TODO в самом гитхаб (onion architecture), а то хуета полная

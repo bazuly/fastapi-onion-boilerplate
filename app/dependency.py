@@ -26,7 +26,7 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-async def get_audit_service(request: Request) -> UserLogService:
+async def get_log_service(request: Request) -> UserLogService:
     client = AsyncIOMotorClient(
         settings.MONGODB_URL, uuidRepresentation='standard')
     collection = client.get_database('user_logs').get_collection('user_logs')
@@ -51,7 +51,7 @@ async def get_application_service(
         application_repository: ApplicationRepository = Depends(
             get_application_repository),
         kafka_producer: KafkaProducer = Depends(get_kafka_producer),
-        user_log_service: UserLogService = Depends(get_audit_service),
+        user_log_service: UserLogService = Depends(get_log_service),
 ) -> ApplicationService:
     return ApplicationService(
         application_repository=application_repository,
@@ -71,9 +71,11 @@ async def get_image_upload_service(
         image_upload_repository: ImageRepository = Depends(
             get_image_upload_repository),
         kafka_producer: KafkaProducer = Depends(get_kafka_producer),
+        user_log_service: UserLogService = Depends(get_log_service),
 ) -> ImageService:
     return ImageService(
         image_repository=image_upload_repository,
         kafka_producer=kafka_producer,
         logger=logger,
+        user_log_service=user_log_service
     )
