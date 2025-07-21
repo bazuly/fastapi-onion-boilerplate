@@ -32,15 +32,13 @@ class ImageService:
     ) -> ImageResponse:
         try:
             uploaded_image = await self.image_repository.upload_image(image, user_id)
+            await self.user_log_service.log_endpoint_call(endpoint="upload_image", user_id=user_id)
         except ImageUploadError as e:
             self.logger.error("Error during image upload: {}".format(e))
-            raise
-
-        try:
-            await self.user_log_service.log_endpoint_call(endpoint="upload_image", user_id=user_id)
         except RecordMongoException as e:
             self.logger.error(
                 "Error during data record, MongoDB: {}".format(e))
+            raise
 
         kafka_produce_message = {
             "id": uploaded_image.id,
